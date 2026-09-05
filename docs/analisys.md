@@ -4,8 +4,8 @@ type of person? How is this distinction reflected in a class
 hierarchy?**
 
 Answer: The common attributes for all people are name, 
-identification number, and contact phone. The customer type 
-has a purchase history and an email. The employee/vendor type 
+id, and contact phone. The customer type 
+has a purchase history and an email. The employee/seller type 
 has an employee code and an assigned work shift. This 
 distinction is reflected by placing the common attributes in 
 the parent class Person, which inherits them to the child 
@@ -27,7 +27,7 @@ the store have in common, regardless of their type? What
 characteristics are specific to each product type?**
 
 Answer: The common attributes of the product class are 
-identifier, title, price, and available stock quantity. The 
+id, title, price, and available stock quantity. The 
 video game product type has attributes for platform type, 
 genre, and age rating. The console product type has attributes 
 for brand, model, and generation.
@@ -42,13 +42,13 @@ Answer: This behavior should be declared as an abstract method
 without a body or implementation inside the parent class. The 
 object-oriented mechanism that allows this is called polymorphism.
 
-**5. A sale involves a customer, a vendor, and one or more 
+**5. A sale involves a customer, a seller, and one or more 
 products. What type of relationships exist between the class 
 representing the sale and the other classes of the system? Are 
 these relationships of inheritance, association, composition, 
 or another type? Justify.**
 
-Answer: The relationship between the vendor and sale classes 
+Answer: The relationship between the seller and sale classes 
 is aggregation with a one-to-many cardinality; the sale and 
 customer classes have an aggregation relationship with a 
 one-to-many cardinality; and the sale and product classes have 
