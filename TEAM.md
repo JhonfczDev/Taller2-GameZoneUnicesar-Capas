@@ -5,9 +5,9 @@ Markdown
 
 | Role | Full Name | Assigned Module | Feature Branch |
 | :--- | :--- | :--- | :--- |
-| **Technical Leader** | [Nombre del Líder] | Sales & Integration | `main` / `develop` |
-| **Developer 1** | [Nombre del Dev 1] | Products | `feature/product-module` |
-| **Developer 2** | [Nombre del Dev 2] | Persons | `feature/person-module` |
+| **Technical Leader** | Jhon Fredy Chinchilla Zapata | Sales & Integration | `main` / `develop` |
+| **Developer 1** | Elkin Jímenez Lara | Products | `feature/product-module` |
+| **Developer 2** | Sebastián Flores Gómez | Persons | `feature/person-module` |
 
 ---
 
