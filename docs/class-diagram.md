@@ -13,7 +13,10 @@ classDiagram
 
         class Customer {
             -String email
+            -List<Sale> purchaseHistory
             +getEmail() String
+            +getPurchaseHistory() List<Sale>
+            +addPurchas(Sale sale) void
         }
 
         class Seller {
@@ -100,13 +103,13 @@ classDiagram
 
     namespace Persistence {
         class ProductRepository {
-            -String filePath
+            -File file
             +saveAll(List~Product~ products) void
             +loadAll() List~Product~
         }
 
         class PersonRepository {
-            -String filePath
+            -File file
             +saveAll(List~Person~ persons) void
             +loadAll() List~Person~
         }
