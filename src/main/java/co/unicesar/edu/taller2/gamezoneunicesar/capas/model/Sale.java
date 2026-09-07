@@ -67,4 +67,23 @@ public class Sale {
         }
     }
     
+    public String printSale() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Sale:\n");
+        sb.append("  id: ").append(id).append("\n");
+        sb.append("  date: ").append(date).append("\n");
+        sb.append("  customer: ").append(customer != null ? customer.getName() : "N/A").append("\n");
+        sb.append("  seller: ").append(seller != null ? seller.getName() : "N/A").append("\n");
+        sb.append("  products:\n");
+        if (products.isEmpty()) {
+            sb.append("    (none)\n");
+        } else {
+            for (Product product : products) {
+                sb.append("    - ").append(product.getTitle()).append("\n");
+            }
+        }
+        sb.append("  total: ").append(calculateTotal());
+        return sb.toString();
+    }
+    
 }
