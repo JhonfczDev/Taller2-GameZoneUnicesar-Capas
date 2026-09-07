@@ -65,6 +65,27 @@ public class SaleService {
         
     }
     
+    public List<Sale> getSalesBySeller(String sellerId) {
+        Seller seller = personService.findSellerById(sellerId);
+        if (seller == null) {
+            throw new IllegalArgumentException("No se encontro vendedor con el id: " + sellerId);
+        }
+
+        List<Sale> result = new ArrayList<>();
+        for (String line : saleRepository.findAllLines()) {
+            if (line.isBlank()) continue;
+
+            String[] fields = line.split(";", -1);
+            if (fields.length > 3 && fields[3].equals(sellerId)) {
+                Sale sale = buildSaleFromLine(line);
+                if (sale != null) {
+                    result.add(sale);
+                }
+            }
+        }
+        return result;
+    }
+    
     public List<Sale> getSalesByCustomer(String customerId) {
         Customer customer = personService.findCustomerById(customerId);
         if (customer == null) {
