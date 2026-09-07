@@ -43,6 +43,20 @@ public class SaleRepository {
         }
     }
     
+    public List<String> findAllLines() {
+        List<String> lines = new ArrayList<>();
+        try {
+            Path path = Paths.get(FILE_PATH);
+            if (!Files.exists(path)) {
+                return lines;
+            }
+            lines = Files.readAllLines(path);
+        } catch (IOException e) {
+            System.err.println("Error loading sales: " + e.getMessage());
+        }
+        return lines;
+    }
+    
     private String toLine(Sale sale) {
         StringBuilder productIds = new StringBuilder();
         List<Product> products = sale.getProducts();
