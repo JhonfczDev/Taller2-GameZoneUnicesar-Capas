@@ -21,5 +21,36 @@ public class Sale {
         this.products = products != null ? new ArrayList<>(products) : new ArrayList<>();
     }
     
+    public String getId() {
+        return id;
+    }
+    public LocalDate getDate() {
+        return date;
+    }
+    public Customer getCustomer() {
+        return customer;
+    }
+    public Seller getSeller() {
+        return seller;
+    }
+    public List<Product> getProducts() {
+        return new ArrayList<>(products); 
+    }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+    public void setSeller(Seller seller) {
+        this.seller = seller;
+    }
+    public void setProducts(List<Product> products) {
+        this.products = products != null ? new ArrayList<>(products) : new ArrayList<>();
+    }
     
 }
