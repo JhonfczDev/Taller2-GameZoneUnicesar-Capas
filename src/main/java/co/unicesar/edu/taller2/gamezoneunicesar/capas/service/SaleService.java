@@ -65,6 +65,52 @@ public class SaleService {
         
     }
     
+    private Sale buildSaleFromLine(String line) {
+        try {
+            String[] fields = line.split(";", -1);
+
+            String id = fields[0];
+            LocalDate date = LocalDate.parse(fields[1]);
+            String customerId = fields[2];
+            String sellerId = fields[3];
+            String productsField = fields.length > 4 ? fields[4] : "";
+
+            List<String> productIds = new ArrayList<>();
+            if (!productsField.isBlank()) {
+                for (String pid : productsField.split(",")) {
+                    productIds.add(pid.trim());
+                }
+            }
+
+            return buildSale(id, date, customerId, sellerId, productIds);
+
+        } catch (Exception e) {
+            System.err.println("Error al procesar la linea de venta: " + line + " → " + e.getMessage());
+            return null;
+        }
+    }
+    
+    private Sale buildSale(String id, LocalDate date, String customerId,
+                           String sellerId, List<String> productIds) {
+
+        Customer customer = personService.findCustomerById(customerId);
+        Seller seller = personService.findSellerById(sellerId);
+
+        if (customer == null || seller == null) {
+            return null;
+        }
+
+        List<Product> products = new ArrayList<>();
+        for (String productId : productIds) {
+            Product product = productService.findById(productId);
+            if (product != null) {
+                products.add(product);
+            }
+        }
+
+        return new Sale(id, date, customer, seller, products);
+    }
+    
     private String generateSaleId() {
         return "S" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
