@@ -21,6 +21,24 @@ public class SaleRepository {
         ensureFileExists();
     }
     
+    private String toLine(Sale sale) {
+        StringBuilder productIds = new StringBuilder();
+        List<Product> products = sale.getProducts();
+
+        for (int i = 0; i < products.size(); i++) {
+            productIds.append(products.get(i).getId());
+            if (i < products.size() - 1) {
+                productIds.append(PRODUCT_SEPARATOR);
+            }
+        }
+
+        return sale.getId() + DELIMITER
+                + sale.getDate() + DELIMITER
+                + sale.getCustomer().getId() + DELIMITER
+                + sale.getSeller().getId() + DELIMITER
+                + productIds;
+    }
+    
     private void ensureFileExists() {
         try {
             Path path = Paths.get(FILE_PATH);
