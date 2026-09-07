@@ -25,6 +25,46 @@ public class SaleService {
         this.personService = personService;
     }
     
+    public void registerSale(String customerId, String sellerId, List<String> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            throw new IllegalArgumentException("A sale must contain at least one product.");
+        }
+        
+        Customer customer = personService.findCustomerById(customerId);
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer not found with id: " + customerId);
+        }
+        
+        Seller seller = personService.findSellerById(sellerId);
+        if (seller == null) {
+            throw new IllegalArgumentException("Seller not found with id: " + sellerId);
+        }
+        
+        List<Product> products = new ArrayList<>();
+        for (String productId : productIds) {
+            Product product = productService.findById(productId);
+            if (product == null) {
+                throw new IllegalArgumentException("Product not found with id: " + productId);
+            }
+            if (product.getStockQuantity() <= 0) {
+                throw new IllegalArgumentException(
+                        "Insufficient stock for product: " + product.getTitle());
+            }
+            products.add(product);
+        }
+        
+        String saleId = generateSaleId();
+        Sale sale = new Sale(saleId, LocalDate.now(), customer, seller, products);
+        
+        for (Product product : products) {
+            product.setStockQuantity(product.getStockQuantity() - 1);
+            productService.update(product);
+        }
+        
+        saleRepository.save(sale);
+        
+    }
+    
     private String generateSaleId() {
         return "S" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
