@@ -27,17 +27,17 @@ public class SaleService {
     
     public void registerSale(String customerId, String sellerId, List<String> productIds) {
         if (productIds == null || productIds.isEmpty()) {
-            throw new IllegalArgumentException("A sale must contain at least one product.");
+            throw new IllegalArgumentException("Una venta tiene que tener por lo menos un producto.");
         }
         
         Customer customer = personService.findCustomerById(customerId);
         if (customer == null) {
-            throw new IllegalArgumentException("Customer not found with id: " + customerId);
+            throw new IllegalArgumentException("No se encontro cliente con el id: " + customerId);
         }
         
         Seller seller = personService.findSellerById(sellerId);
         if (seller == null) {
-            throw new IllegalArgumentException("Seller not found with id: " + sellerId);
+            throw new IllegalArgumentException("No se encontro vendedor con el id: " + sellerId);
         }
         
         List<Product> products = new ArrayList<>();
@@ -48,7 +48,7 @@ public class SaleService {
             }
             if (product.getStockQuantity() <= 0) {
                 throw new IllegalArgumentException(
-                        "Insufficient stock for product: " + product.getTitle());
+                        "Stock insuficiente para el producto: " + product.getTitle());
             }
             products.add(product);
         }
@@ -63,6 +63,20 @@ public class SaleService {
         
         saleRepository.save(sale);
         
+    }
+    
+    public List<Sale> getAllSales() {
+        List<Sale> sales = new ArrayList<>();
+
+        for (String line : saleRepository.findAllLines()) {
+            if (line.isBlank()) continue;
+
+            Sale sale = buildSaleFromLine(line);
+            if (sale != null) {
+                sales.add(sale);
+            }
+        }
+        return sales;
     }
     
     private Sale buildSaleFromLine(String line) {
