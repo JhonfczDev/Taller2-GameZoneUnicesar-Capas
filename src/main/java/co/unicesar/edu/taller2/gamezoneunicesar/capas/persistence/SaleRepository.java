@@ -21,5 +21,18 @@ public class SaleRepository {
         ensureFileExists();
     }
     
+    private void ensureFileExists() {
+        try {
+            Path path = Paths.get(FILE_PATH);
+            if (path.getParent() != null) {
+                Files.createDirectories(path.getParent());
+            }
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+        } catch (IOException e) {
+            System.err.println("Error creating sales file: " + e.getMessage());
+        }
+    }
     
 }
