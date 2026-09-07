@@ -21,6 +21,18 @@ public class SaleRepository {
         ensureFileExists();
     }
     
+    public void saveAll(List<Sale> sales) {
+        List<String> lines = new ArrayList<>();
+        for (Sale sale : sales) {
+            lines.add(toLine(sale));
+        }
+        try {
+            Files.write(Paths.get(FILE_PATH), lines);
+        } catch (IOException e) {
+            System.err.println("Error saving all sales: " + e.getMessage());
+        }
+    }
+    
     private String toLine(Sale sale) {
         StringBuilder productIds = new StringBuilder();
         List<Product> products = sale.getProducts();
