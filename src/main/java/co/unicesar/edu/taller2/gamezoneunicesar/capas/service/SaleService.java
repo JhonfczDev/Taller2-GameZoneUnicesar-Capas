@@ -25,4 +25,11 @@ public class SaleService {
         this.personService = personService;
     }
     
+    private String generateSaleId() {
+        return "S" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+    
+    
+    
+    
 }
