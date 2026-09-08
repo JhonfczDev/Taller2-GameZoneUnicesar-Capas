@@ -9,7 +9,8 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
  * Class responsible for persisting Person objects (Customer and Seller)
  * to a plain text file, using a simple CSV-like format.
  * Manages saving (saveAll), loading (loadAll), and searching
- * for persons by ID.
+ * for persons by ID, and also verifies that the data file exists
+ * before using it.
  */
 public class PersonRepository {
     private File file; // Physical file where data is read from / written to
@@ -151,5 +152,27 @@ public class PersonRepository {
             }
         }
         return null;
+    }
+
+    /**
+     * Ensures that the data file physically exists on disk.
+     * If the parent directory doesn't exist, it is created (including any
+     * necessary subdirectories). If the file itself doesn't exist, it is
+     * created empty. Any I/O error during this process is logged to the
+     * console instead of stopping execution, so it doesn't prevent the
+     * repository from being used.
+     */
+    private void ensureFileExists() {
+        try {
+            File parent = file.getParentFile();
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs(); // Creates all necessary intermediate directories
+            }
+            if (!file.exists()) {
+                file.createNewFile(); // Creates an empty file if it doesn't exist
+            }
+        } catch (IOException e) {
+            System.err.println("Error creating the persons file: " + e.getMessage());
+        }
     }
 }
