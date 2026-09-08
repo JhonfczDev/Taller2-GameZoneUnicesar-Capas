@@ -8,7 +8,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 /**
  * Class responsible for persisting Person objects (Customer and Seller)
  * to a plain text file, using a simple CSV-like format.
- * Manages saving (saveAll) of persons.
+ * Manages saving (saveAll) and loading (loadAll) of persons.
  */
 public class PersonRepository {
     private File file; // Physical file where data is read from / written to
@@ -73,5 +73,53 @@ public class PersonRepository {
             // Rethrown as an unchecked exception to simplify error handling
             throw new RuntimeException("Error saving persons...", e);
         }
+    }
+
+    /**
+     * Reads the file line by line and rebuilds the list of Person objects,
+     * distinguishing between Customer and Seller based on the first column
+     * of each line. If the file doesn't exist, returns an empty list instead
+     * of failing. Empty lines are skipped.
+     * @return list of people loaded from the file
+     */
+    public List<Person> loadAll(){
+
+        List<Person> persons = new ArrayList<>();
+
+        // If the file doesn't exist yet, there's nothing to load
+        if (!file.exists()) {
+            return persons;
+
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                // Skip empty lines (e.g., trailing newlines at the end of the file)
+                if (line.trim().isEmpty()) continue;
+
+                // Split the line by commas to get each field
+                String[] data = line.split(",");
+
+                if (data[0].equals("CUSTOMER")) {
+                    // data[1]=id, data[2]=name, data[3]=phone, data[4]=email
+                    Customer customer = new Customer(data[1], data[2], data[3], data[4] );
+
+                    persons.add(customer);
+
+                } else if (data[0].equals("SELLER")) {
+                    // data[1]=id, data[2]=name, data[3]=phone, data[4]=employeeCode, data[5]=workShift
+                    Seller seller = new Seller(data[1], data[2], data[3], data[4], data[5]);
+
+                    persons.add(seller);
+                }
+            }
+        } catch (IOException e) {
+            // Rethrown as an unchecked exception to simplify error handling
+            throw new RuntimeException("Error loading persons...", e);
+        }
+
+        return persons;
     }
 }
