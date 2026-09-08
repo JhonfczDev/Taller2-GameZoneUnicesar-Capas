@@ -8,7 +8,8 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 /**
  * Class responsible for persisting Person objects (Customer and Seller)
  * to a plain text file, using a simple CSV-like format.
- * Manages saving (saveAll) and loading (loadAll) of persons.
+ * Manages saving (saveAll), loading (loadAll), and searching
+ * for persons by ID.
  */
 public class PersonRepository {
     private File file; // Physical file where data is read from / written to
@@ -121,5 +122,34 @@ public class PersonRepository {
         }
 
         return persons;
+    }
+
+    /**
+     * Finds a customer by their id, by iterating over the full list loaded from the file.
+     * Note: internally calls loadAll(), so every search re-reads the entire file.
+     * @param id customer's identifier
+     * @return the Customer found, or null if it doesn't exist
+     */
+    public Customer findCustomerById(String id) {
+        for (Person person : loadAll()) {
+            if (person instanceof Customer && person.getId().equals(id)) {
+                return (Customer) person;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds a seller by their id, by iterating over the full list loaded from the file.
+     * @param id seller's identifier
+     * @return the Seller found, or null if it doesn't exist
+     */
+    public Seller findSellerById(String id) {
+        for (Person person : loadAll()) {
+            if (person instanceof Seller && person.getId().equals(id)) {
+                return (Seller) person;
+            }
+        }
+        return null;
     }
 }
