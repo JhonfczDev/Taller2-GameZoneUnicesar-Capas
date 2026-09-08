@@ -151,5 +151,81 @@ public class UI {
             System.out.println("---------------------------");
         }
     }
+    
+    public void personMenu() {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n========== MENU DE PERSONAS ==========");
+            System.out.println("1. Registrar un nuevo cliente");
+            System.out.println("2. Listar todos los clientes registrados");
+            System.out.println("3. Listar todos los vendedores registrados");
+            System.out.println("0. Regresar al menu principal");
+            System.out.print("Seleccione una opcion: ");
+            String option = scanner.nextLine().trim();
+
+            switch (option) {
+                case "1" ->
+                    registerCustomer();
+                case "2" ->
+                    listAllCustomers();
+                case "3" ->
+                    listAllSellers();
+                case "0" ->
+                    back = true;
+                default ->
+                    System.out.println("Opcion invalida.");
+            }
+        }
+    }
+    
+    public void registerCustomer() {
+        System.out.println("\n--- REGISTRAR NUEVO CLIENTE ---");
+        System.out.print("ID: ");
+        String id = scanner.nextLine().trim();
+        System.out.print("Nombre: ");
+        String name = scanner.nextLine().trim();
+        System.out.print("Teléfono: ");
+        String phone = scanner.nextLine().trim();
+        System.out.print("Correo electrónico: ");
+        String email = scanner.nextLine().trim();
+
+        try {
+            personService.registerCustomer(id, name, phone, email);
+            System.out.println("\n¡Cliente registrado con éxito!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+    
+    public void listAllCustomers() {
+        System.out.println("\n--- CLIENTES REGISTRADOS ---");
+        List<Customer> customers = personService.getAllCustomers();
+        if (customers.isEmpty()) {
+            System.out.println("No hay clientes registrados.");
+            return;
+        }
+        for (Customer customer : customers) {
+            System.out.println(customer.getId() + " - " + customer.getName()
+                    + " | Teléfono: " + customer.getPhone()
+                    + " | Correo: " + customer.getEmail());
+            System.out.println("---------------------------");
+        }
+    }
+    
+    public void listAllSellers() {
+        System.out.println("\n--- VENDEDORES REGISTRADOS ---");
+        List<Seller> sellers = personService.getAllSellers();
+        if (sellers.isEmpty()) {
+            System.out.println("No hay vendedores registrados.");
+            return;
+        }
+        for (Seller seller : sellers) {
+            System.out.println(seller.getId() + " - " + seller.getName()
+                    + " | Turno: " + seller.getWorkShift()
+                    + " | Código Empleado: " + seller.getEmployeeCode());
+            System.out.println("---------------------------");
+        }
+    }
+
 
 }
