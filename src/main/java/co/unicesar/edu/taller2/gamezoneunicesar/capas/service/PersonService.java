@@ -7,7 +7,8 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 
 /**
  * Service layer that acts as an intermediary between the business logic
- * and the persistence repository (PersonRepository).
+ * and the persistence repository (PersonRepository).It provides
+ * higher-level operations for registering and querying customers and sellers.
  */
 public class PersonService {
     private PersonRepository repository; // Repository used to read/write data
@@ -67,5 +68,23 @@ public class PersonService {
         }
 
         return sellers;
+    }
+
+    /**
+     * Finds a customer by id, delegating directly to the repository.
+     * @param id customer's identifier
+     * @return the customer found, or null
+     */
+    public Customer findCustomerById(String id) {
+        return repository.findCustomerById(id);
+    }
+
+    /**
+     * Finds a seller by id, delegating directly to the repository.
+     * @param id seller's identifier
+     * @return the seller found, or null
+     */
+    public Seller findSellerById(String id) {
+        return repository.findSellerById(id);
     }
 }
