@@ -13,35 +13,35 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Clase encargada de gestionar la interfaz de usuario por consola de la
- * aplicación GameZone Unicesar.
+ * Class responsible for managing the console-based user interface of the
+ * GameZone Unicesar application.
  * <p>
- * Se encarga de mostrar los distintos menús (principal, productos, personas
- * y ventas), capturar la entrada del usuario a través de un {@link Scanner}
- * y delegar la lógica de negocio a los servicios correspondientes
- * ({@link ProductService}, {@link PersonService} y {@link SaleService}).
+ * It is responsible for displaying the different menus (main, products,
+ * people, and sales), capturing user input through a {@link Scanner}, and
+ * delegating the business logic to the corresponding services
+ * ({@link ProductService}, {@link PersonService}, and {@link SaleService}).
  */
 public class UI {
 
-    /** Objeto utilizado para leer la entrada del usuario desde la consola. */
+    /** Object used to read user input from the console. */
     private final Scanner scanner;
 
-    /** Servicio encargado de la lógica de negocio relacionada con las ventas. */
+    /** Service responsible for the business logic related to sales. */
     private final SaleService saleService;
 
-    /** Servicio encargado de la lógica de negocio relacionada con las personas (clientes y vendedores). */
+    /** Service responsible for the business logic related to people (customers and sellers). */
     private final PersonService personService;
 
-    /** Servicio encargado de la lógica de negocio relacionada con los productos. */
+    /** Service responsible for the business logic related to products. */
     private final ProductService productService;
 
     /**
-     * Crea una nueva instancia de la interfaz de usuario por consola.
+     * Creates a new instance of the console user interface.
      *
-     * @param scanner        objeto utilizado para leer la entrada del usuario
-     * @param saleService    servicio de gestión de ventas
-     * @param personService  servicio de gestión de personas (clientes y vendedores)
-     * @param productService servicio de gestión de productos
+     * @param scanner        object used to read user input
+     * @param saleService    service for managing sales
+     * @param personService  service for managing people (customers and sellers)
+     * @param productService service for managing products
      */
     public ConsoleUI(Scanner scanner,
             SaleService saleService,
@@ -54,11 +54,10 @@ public class UI {
     }
 
     /**
-     * Inicia la ejecución de la aplicación mostrando el menú principal.
+     * Starts the execution of the application by showing the main menu.
      * <p>
-     * Permanece en un ciclo hasta que el usuario seleccione la opción de
-     * salir, redirigiendo al usuario a los distintos submenús según la
-     * opción elegida.
+     * Remains in a loop until the user selects the exit option, redirecting
+     * the user to the different submenus depending on the chosen option.
      */
     public void launch() {
         boolean exit = false;
@@ -89,9 +88,9 @@ public class UI {
     }
     
     /**
-     * Muestra el menú de gestión de productos y procesa la opción
-     * seleccionada por el usuario (registrar videojuego, registrar consola,
-     * listar productos o regresar al menú principal).
+     * Displays the product management menu and processes the option
+     * selected by the user (register video game, register console, list
+     * products, or return to the main menu).
      */
     public void productMenu() {
         boolean back = false;
@@ -120,13 +119,13 @@ public class UI {
     }
     
     /**
-     * Solicita al usuario los datos de un nuevo videojuego (ID, título,
-     * precio, cantidad en stock, plataforma, género y clasificación de
-     * edad) y lo registra a través de {@link ProductService}.
+     * Prompts the user for the data of a new video game (ID, title, price,
+     * stock quantity, platform, genre, and age rating) and registers it
+     * through {@link ProductService}.
      * <p>
-     * Si el precio o el stock ingresados no son numéricos válidos, o si el
-     * servicio detecta algún dato inválido, se informa el error al usuario
-     * por consola.
+     * If the entered price or stock are not valid numbers, or if the
+     * service detects any invalid data, the error is reported to the user
+     * through the console.
      */
     public void registerVideoGame() {
         System.out.println("\n--- REGISTRAR NUEVO VIDEOJUEGO ---");
@@ -156,13 +155,13 @@ public class UI {
     }
     
     /**
-     * Solicita al usuario los datos de una nueva consola (ID, título,
-     * precio, cantidad en stock, marca, modelo y generación) y la registra
-     * a través de {@link ProductService}.
+     * Prompts the user for the data of a new console (ID, title, price,
+     * stock quantity, brand, model, and generation) and registers it
+     * through {@link ProductService}.
      * <p>
-     * Si el precio o el stock ingresados no son numéricos válidos, o si el
-     * servicio detecta algún dato inválido, se informa el error al usuario
-     * por consola.
+     * If the entered price or stock are not valid numbers, or if the
+     * service detects any invalid data, the error is reported to the user
+     * through the console.
      */
     public void registerConsole() {
         System.out.println("\n--- REGISTRAR NUEVA CONSOLA ---");
@@ -192,12 +191,12 @@ public class UI {
     }
     
     /**
-     * Obtiene y muestra por consola el listado completo de productos
-     * registrados en el inventario, incluyendo su ID, título, precio y
-     * cantidad en stock.
+     * Retrieves and displays on the console the full list of products
+     * registered in the inventory, including their ID, title, price, and
+     * stock quantity.
      * <p>
-     * Si no hay productos registrados, se informa al usuario y se termina
-     * la ejecución del método.
+     * If no products are registered, the user is informed and the method
+     * execution ends.
      */
     public void listAllProducts() {
         System.out.println("\n--- INVENTARIO DE PRODUCTOS ---");
@@ -215,9 +214,9 @@ public class UI {
     }
     
     /**
-     * Muestra el menú de gestión de personas y procesa la opción
-     * seleccionada por el usuario (registrar cliente, listar clientes,
-     * listar vendedores o regresar al menú principal).
+     * Displays the people management menu and processes the option
+     * selected by the user (register customer, list customers, list
+     * sellers, or return to the main menu).
      */
     public void personMenu() {
         boolean back = false;
@@ -246,12 +245,12 @@ public class UI {
     }
     
     /**
-     * Solicita al usuario los datos de un nuevo cliente (ID, nombre,
-     * teléfono y correo electrónico) y lo registra a través de
+     * Prompts the user for the data of a new customer (ID, name, phone
+     * number, and email address) and registers it through
      * {@link PersonService}.
      * <p>
-     * Si el servicio detecta algún dato inválido, se informa el error al
-     * usuario por consola.
+     * If the service detects any invalid data, the error is reported to
+     * the user through the console.
      */
     public void registerCustomer() {
         System.out.println("\n--- REGISTRAR NUEVO CLIENTE ---");
@@ -273,11 +272,12 @@ public class UI {
     }
     
     /**
-     * Obtiene y muestra por consola el listado completo de clientes
-     * registrados, incluyendo su ID, nombre, teléfono y correo electrónico.
+     * Retrieves and displays on the console the full list of registered
+     * customers, including their ID, name, phone number, and email
+     * address.
      * <p>
-     * Si no hay clientes registrados, se informa al usuario y se termina
-     * la ejecución del método.
+     * If no customers are registered, the user is informed and the method
+     * execution ends.
      */
     public void listAllCustomers() {
         System.out.println("\n--- CLIENTES REGISTRADOS ---");
@@ -295,12 +295,11 @@ public class UI {
     }
     
     /**
-     * Obtiene y muestra por consola el listado completo de vendedores
-     * registrados, incluyendo su ID, nombre, turno de trabajo y código de
-     * empleado.
+     * Retrieves and displays on the console the full list of registered
+     * sellers, including their ID, name, work shift, and employee code.
      * <p>
-     * Si no hay vendedores registrados, se informa al usuario y se termina
-     * la ejecución del método.
+     * If no sellers are registered, the user is informed and the method
+     * execution ends.
      */
     public void listAllSellers() {
         System.out.println("\n--- VENDEDORES REGISTRADOS ---");
@@ -318,10 +317,10 @@ public class UI {
     }
     
     /**
-     * Muestra el menú de gestión de ventas y procesa la opción
-     * seleccionada por el usuario (registrar venta, listar todas las
-     * ventas, consultar historial por cliente, consultar historial por
-     * vendedor o regresar al menú principal).
+     * Displays the sales management menu and processes the option
+     * selected by the user (register sale, list all sales, view sales
+     * history by customer, view sales history by seller, or return to the
+     * main menu).
      */
     public void saleMenu() {
         boolean back = false;
@@ -347,16 +346,17 @@ public class UI {
     }
     
     /**
-     * Guía al usuario a través del proceso de registro de una nueva venta.
+     * Guides the user through the process of registering a new sale.
      * <p>
-     * Muestra los clientes, vendedores y productos disponibles, solicita
-     * el ID del cliente, el ID del vendedor y los IDs de los productos
-     * (separados por coma) involucrados en la venta, y delega el registro
-     * a {@link SaleService}.
+     * Displays the available customers, sellers, and products, prompts
+     * for the customer ID, the seller ID, and the product IDs (separated
+     * by commas) involved in the sale, and delegates the registration to
+     * {@link SaleService}.
      * <p>
-     * Si no hay clientes, vendedores o productos disponibles, se informa
-     * al usuario y se cancela el registro. Si el servicio detecta algún
-     * dato inválido, se informa el error por consola.
+     * If there are no customers, sellers, or products available, the user
+     * is informed and the registration is cancelled. If the service
+     * detects any invalid data, the error is reported through the
+     * console.
      */
     public void registerSale() {
         System.out.println("\n--- REGISTRAR NUEVA VENTA ---");
@@ -421,11 +421,11 @@ public class UI {
     }
     
     /**
-     * Obtiene y muestra por consola el listado completo de ventas
-     * registradas en el sistema.
+     * Retrieves and displays on the console the full list of sales
+     * registered in the system.
      * <p>
-     * Si no hay ventas registradas, se informa al usuario y se termina la
-     * ejecución del método.
+     * If no sales are registered, the user is informed and the method
+     * execution ends.
      */
     public void listAllSales() {
         System.out.println("\n--- TODAS LAS VENTAS ---");
@@ -441,13 +441,13 @@ public class UI {
     }
     
     /**
-     * Muestra el listado de clientes registrados, solicita el ID de un
-     * cliente y muestra por consola el historial de ventas asociado a
-     * dicho cliente, obtenido a través de {@link SaleService}.
+     * Displays the list of registered customers, prompts for a customer
+     * ID, and displays on the console the sales history associated with
+     * that customer, obtained through {@link SaleService}.
      * <p>
-     * Si el cliente no tiene compras registradas, se informa al usuario.
-     * Si el servicio detecta un ID inválido, se informa el error por
-     * consola.
+     * If the customer has no registered purchases, the user is informed.
+     * If the service detects an invalid ID, the error is reported through
+     * the console.
      */
     public void salesByClient() {
         System.out.println("\n--- VENTAS POR CLIENTE ---");
@@ -474,13 +474,13 @@ public class UI {
     }
     
     /**
-     * Muestra el listado de vendedores registrados, solicita el ID de un
-     * vendedor y muestra por consola el historial de ventas atendidas por
-     * dicho vendedor, obtenido a través de {@link SaleService}.
+     * Displays the list of registered sellers, prompts for a seller ID,
+     * and displays on the console the sales history handled by that
+     * seller, obtained through {@link SaleService}.
      * <p>
-     * Si el vendedor no tiene ventas atendidas, se informa al usuario. Si
-     * el servicio detecta un ID inválido, se informa el error por
-     * consola.
+     * If the seller has not handled any sales, the user is informed. If
+     * the service detects an invalid ID, the error is reported through
+     * the console.
      */
     public void salesBySeller() {
         System.out.println("\n--- VENTAS POR VENDEDOR ---");
