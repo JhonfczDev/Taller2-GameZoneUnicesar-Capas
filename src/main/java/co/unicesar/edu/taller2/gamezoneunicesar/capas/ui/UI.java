@@ -12,13 +12,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Class responsible for managing the console-based user interface of the
+ * GameZone Unicesar application.
+ * <p>
+ * It is responsible for displaying the different menus (main, products,
+ * people, and sales), capturing user input through a {@link Scanner}, and
+ * delegating the business logic to the corresponding services
+ * ({@link ProductService}, {@link PersonService}, and {@link SaleService}).
+ */
 public class UI {
 
+    /** Object used to read user input from the console. */
     private final Scanner scanner;
+
+    /** Service responsible for the business logic related to sales. */
     private final SaleService saleService;
+
+    /** Service responsible for the business logic related to people (customers and sellers). */
     private final PersonService personService;
+
+    /** Service responsible for the business logic related to products. */
     private final ProductService productService;
 
+    /**
+     * Creates a new instance of the console user interface.
+     *
+     * @param scanner        object used to read user input
+     * @param saleService    service for managing sales
+     * @param personService  service for managing people (customers and sellers)
+     * @param productService service for managing products
+     */
     public ConsoleUI(Scanner scanner,
             SaleService saleService,
             PersonService personService,
@@ -29,6 +53,12 @@ public class UI {
         this.productService = productService;
     }
 
+    /**
+     * Starts the execution of the application by showing the main menu.
+     * <p>
+     * Remains in a loop until the user selects the exit option, redirecting
+     * the user to the different submenus depending on the chosen option.
+     */
     public void launch() {
         boolean exit = false;
         while (!exit) {
@@ -57,6 +87,11 @@ public class UI {
         }
     }
     
+    /**
+     * Displays the product management menu and processes the option
+     * selected by the user (register video game, register console, list
+     * products, or return to the main menu).
+     */
     public void productMenu() {
         boolean back = false;
         while (!back) {
@@ -83,6 +118,15 @@ public class UI {
         }
     }
     
+    /**
+     * Prompts the user for the data of a new video game (ID, title, price,
+     * stock quantity, platform, genre, and age rating) and registers it
+     * through {@link ProductService}.
+     * <p>
+     * If the entered price or stock are not valid numbers, or if the
+     * service detects any invalid data, the error is reported to the user
+     * through the console.
+     */
     public void registerVideoGame() {
         System.out.println("\n--- REGISTRAR NUEVO VIDEOJUEGO ---");
         System.out.print("ID: ");
@@ -110,6 +154,15 @@ public class UI {
         }
     }
     
+    /**
+     * Prompts the user for the data of a new console (ID, title, price,
+     * stock quantity, brand, model, and generation) and registers it
+     * through {@link ProductService}.
+     * <p>
+     * If the entered price or stock are not valid numbers, or if the
+     * service detects any invalid data, the error is reported to the user
+     * through the console.
+     */
     public void registerConsole() {
         System.out.println("\n--- REGISTRAR NUEVA CONSOLA ---");
         System.out.print("ID: ");
@@ -137,6 +190,14 @@ public class UI {
         }
     }
     
+    /**
+     * Retrieves and displays on the console the full list of products
+     * registered in the inventory, including their ID, title, price, and
+     * stock quantity.
+     * <p>
+     * If no products are registered, the user is informed and the method
+     * execution ends.
+     */
     public void listAllProducts() {
         System.out.println("\n--- INVENTARIO DE PRODUCTOS ---");
         List<Product> products = productService.getAllProducts();
@@ -152,6 +213,11 @@ public class UI {
         }
     }
     
+    /**
+     * Displays the people management menu and processes the option
+     * selected by the user (register customer, list customers, list
+     * sellers, or return to the main menu).
+     */
     public void personMenu() {
         boolean back = false;
         while (!back) {
@@ -178,6 +244,14 @@ public class UI {
         }
     }
     
+    /**
+     * Prompts the user for the data of a new customer (ID, name, phone
+     * number, and email address) and registers it through
+     * {@link PersonService}.
+     * <p>
+     * If the service detects any invalid data, the error is reported to
+     * the user through the console.
+     */
     public void registerCustomer() {
         System.out.println("\n--- REGISTRAR NUEVO CLIENTE ---");
         System.out.print("ID: ");
@@ -197,6 +271,14 @@ public class UI {
         }
     }
     
+    /**
+     * Retrieves and displays on the console the full list of registered
+     * customers, including their ID, name, phone number, and email
+     * address.
+     * <p>
+     * If no customers are registered, the user is informed and the method
+     * execution ends.
+     */
     public void listAllCustomers() {
         System.out.println("\n--- CLIENTES REGISTRADOS ---");
         List<Customer> customers = personService.getAllCustomers();
@@ -212,6 +294,13 @@ public class UI {
         }
     }
     
+    /**
+     * Retrieves and displays on the console the full list of registered
+     * sellers, including their ID, name, work shift, and employee code.
+     * <p>
+     * If no sellers are registered, the user is informed and the method
+     * execution ends.
+     */
     public void listAllSellers() {
         System.out.println("\n--- VENDEDORES REGISTRADOS ---");
         List<Seller> sellers = personService.getAllSellers();
@@ -227,6 +316,12 @@ public class UI {
         }
     }
     
+    /**
+     * Displays the sales management menu and processes the option
+     * selected by the user (register sale, list all sales, view sales
+     * history by customer, view sales history by seller, or return to the
+     * main menu).
+     */
     public void saleMenu() {
         boolean back = false;
         while (!back) {
@@ -250,6 +345,19 @@ public class UI {
         }
     }
     
+    /**
+     * Guides the user through the process of registering a new sale.
+     * <p>
+     * Displays the available customers, sellers, and products, prompts
+     * for the customer ID, the seller ID, and the product IDs (separated
+     * by commas) involved in the sale, and delegates the registration to
+     * {@link SaleService}.
+     * <p>
+     * If there are no customers, sellers, or products available, the user
+     * is informed and the registration is cancelled. If the service
+     * detects any invalid data, the error is reported through the
+     * console.
+     */
     public void registerSale() {
         System.out.println("\n--- REGISTRAR NUEVA VENTA ---");
         
@@ -312,6 +420,13 @@ public class UI {
         }
     }
     
+    /**
+     * Retrieves and displays on the console the full list of sales
+     * registered in the system.
+     * <p>
+     * If no sales are registered, the user is informed and the method
+     * execution ends.
+     */
     public void listAllSales() {
         System.out.println("\n--- TODAS LAS VENTAS ---");
         List<Sale> sales = saleService.getAllSales();
@@ -325,6 +440,15 @@ public class UI {
         }
     }
     
+    /**
+     * Displays the list of registered customers, prompts for a customer
+     * ID, and displays on the console the sales history associated with
+     * that customer, obtained through {@link SaleService}.
+     * <p>
+     * If the customer has no registered purchases, the user is informed.
+     * If the service detects an invalid ID, the error is reported through
+     * the console.
+     */
     public void salesByClient() {
         System.out.println("\n--- VENTAS POR CLIENTE ---");
         System.out.println("Clientes registrados:");
@@ -349,6 +473,15 @@ public class UI {
         }
     }
     
+    /**
+     * Displays the list of registered sellers, prompts for a seller ID,
+     * and displays on the console the sales history handled by that
+     * seller, obtained through {@link SaleService}.
+     * <p>
+     * If the seller has not handled any sales, the user is informed. If
+     * the service detects an invalid ID, the error is reported through
+     * the console.
+     */
     public void salesBySeller() {
         System.out.println("\n--- VENTAS POR VENDEDOR ---");
         System.out.println("Vendedores registrados:");
