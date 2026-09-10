@@ -30,6 +30,7 @@ public class PersonRepository {
      */
     public PersonRepository(String filePath) {
         this.file = new File(filePath);
+        initializeDefaultSellers();
     }
 
     /**
@@ -174,5 +175,49 @@ public class PersonRepository {
         } catch (IOException e) {
             System.err.println("Error creating the persons file: " + e.getMessage());
         }
+    }
+
+    /**
+     * Initializes the persistence file with three default sellers
+     * when the file does not exist or is empty.
+     * This ensures that the application starts with the minimum
+     * required number of preloaded sellers.
+     */
+    private void initializeDefaultSellers() {
+        if(file.exists() && file.length() > 0) {return;}
+
+        List<Person> defaultSellers = new ArrayList<>();
+
+        defaultSellers.add(
+                new Seller(
+                        "0001",
+                        "Carlos Gomez",
+                        "3105456211",
+                        "EMP001",
+                        "Morning"
+                )
+        );
+
+        defaultSellers.add(
+                new Seller(
+                        "0002",
+                        "Laura Martinez",
+                        "3015114171",
+                        "EMP002",
+                        "Evening"
+                )
+        );
+
+        defaultSellers.add(
+                new Seller(
+                        "0003",
+                        "Andres Rodriguez",
+                        "3155186270",
+                        "EMP003",
+                        "Afternoon"
+                )
+        );
+
+        saveAll(defaultSellers);
     }
 }
