@@ -14,7 +14,7 @@ public class Console extends Product{
 
     @Override
     public String getDescription() {
-        return "";
+        return "Console: " + getTitle() + ", Brand: " + brand + ", Model: " + model + ", Generation: " + generation + ", $" + getPrice();
     }
 
     public String getBrand() {
