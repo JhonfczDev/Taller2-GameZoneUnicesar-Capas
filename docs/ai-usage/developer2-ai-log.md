@@ -253,6 +253,24 @@ Documentation wording and GitHub Pull Request guidance.
 
 ---
 
+## Interaction 13 — Query about creating branches
+
+**Topic:** Branch creation
+
+**Question / request made to the AI:**  
+For the changes I need to make in the project, is it correct to create a single branch for several related changes, or should I create separate branches for each functionality?
+
+**AI assistance:**  
+The AI explained that, following a feature-based workflow, it is recommended to create separate branches when the changes correspond to different functionalities or responsibilities. When several changes are part of the same functionality and are closely related, they can remain in the same branch. The AI also recommended making atomic commits to facilitate review through Pull Requests.
+
+**How I used the response:**  
+The AI was used to properly organize the work into branches and determine when changes should be separated into different branches, while maintaining a workflow consistent with the requirements of the assignment.
+
+**Type of AI use:**  
+Clarification of the use of the branches.
+
+---
+
 ## Git workflow followed
 
 The workshop requires feature branches to be derived from `develop`, atomic commits to be pushed immediately, and Pull Requests to be reviewed before merging. The AI was used to clarify these Git operations and naming conventions.
