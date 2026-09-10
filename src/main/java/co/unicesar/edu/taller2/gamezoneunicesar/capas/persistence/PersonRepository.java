@@ -30,6 +30,7 @@ public class PersonRepository {
      */
     public PersonRepository(String filePath) {
         this.file = new File(filePath);
+        ensureFileExists();
         initializeDefaultSellers();
     }
 
@@ -217,7 +218,7 @@ public class PersonRepository {
                         "Afternoon"
                 )
         );
-
+        // We save the pre-set sellers
         saveAll(defaultSellers);
     }
 }
