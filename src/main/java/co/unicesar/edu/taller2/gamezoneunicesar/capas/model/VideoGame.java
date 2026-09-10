@@ -15,7 +15,7 @@ public class VideoGame extends Product{
 
     @Override
     public String getDescription() {
-        return "";
+        return "Video Game: " + getTitle() + ", Platform: " + platform + ", Genre: " + genre + ", Age Rating: " + ageRating + ", $" + getPrice();
     }
 
     public String getPlatform() {
