@@ -7,10 +7,11 @@ public abstract class Warranty {
     private int duration; // Duration in months
     private String priceProduct; // Price of the product associated with the warranty
 
-    public Warranty(String fabricDefects, int duration, String priceProduct) {
+    public Warranty(String fabricDefects, int duration, String priceProduct, String id) {
         this.fabricDefects = fabricDefects;
         this.duration = duration;
         this.priceProduct = priceProduct;
+        this.id = id;
     }
 
     public abstract String getWarrantyCost();
