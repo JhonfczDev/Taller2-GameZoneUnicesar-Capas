@@ -1,12 +1,12 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas;
 
-import persistence.PersonRepository;
-import persistence.ProductRepository;
-import persistence.SaleRepository;
-import service.PersonService;
-import service.ProductService;
-import service.SaleService;
-import ui.ConsoleUI;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PersonRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ProductRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.SaleRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.PersonService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.ui.UI;
 
 import java.util.Scanner;
 
@@ -48,7 +48,7 @@ public class Main {
         SaleService saleService = new SaleService(saleRepository, productService, personService);
         Scanner scanner = new Scanner(System.in);
         
-        ConsoleUI consoleUI = new ConsoleUI(scanner, saleService, personService, productService );
+        UI consoleUI = new UI(scanner, saleService, personService, productService );
         
         consoleUI.launch();
     }

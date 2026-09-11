@@ -1,12 +1,12 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.ui;
 
-import service.PersonService;
-import service.ProductService;
-import service.SaleService;
-import model.Customer;
-import model.Product;
-import model.Sale;
-import model.Seller;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.PersonService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Customer;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class UI {
      * @param personService  service for managing people (customers and sellers)
      * @param productService service for managing products
      */
-    public ConsoleUI(Scanner scanner,
+    public UI(Scanner scanner,
             SaleService saleService,
             PersonService personService,
             ProductService productService) {
