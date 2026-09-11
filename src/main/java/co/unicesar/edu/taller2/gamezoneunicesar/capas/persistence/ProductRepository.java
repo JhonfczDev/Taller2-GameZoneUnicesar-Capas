@@ -65,10 +65,10 @@ public class ProductRepository {
         }
 
         try (FileInputStream in = new FileInputStream(file);
-             Scanner scanner = new Scanner(in)){
+             Scanner sc = new Scanner(in)){
 
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
                     if (line.trim().isEmpty()) continue;
 
                     String[] data = line.split(",");
