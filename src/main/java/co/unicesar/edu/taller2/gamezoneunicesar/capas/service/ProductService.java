@@ -1,6 +1,6 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.repository.ProductRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ProductRepository;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.VideoGame;
