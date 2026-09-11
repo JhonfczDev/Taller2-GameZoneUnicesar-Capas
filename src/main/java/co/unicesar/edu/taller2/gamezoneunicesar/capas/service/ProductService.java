@@ -29,8 +29,11 @@ public class ProductService {
         repository.saveAll(products);
     }
 
-    public List<Product> getAllProducts() {
-        return repository.loadAll();
+    public void registerVideoGame(String id, String title, double price, int stockquantity, String platform, String genre, String ageRating){
+        VideoGame videoGame = new VideoGame(id, title, price, stockquantity, platform, genre, ageRating);
+        List<Product> products = repository.loadAll();
+        products.add(videoGame);
+        repository.saveAll(products);
     }
 
     public List<Product> getAllProducts(){
