@@ -15,13 +15,6 @@ public class ProductService {
         this.repository = repository;
     }
 
-    public void registerProduct(String id, String title, double price, int stockquantity, String platform, String genre, String ageRating){
-        VideoGame videoGame = new VideoGame(id, title, price, stockquantity, platform, genre, ageRating);
-        List<Product> products = repository.loadAll();
-        products.add(videoGame);
-        repository.saveAll(products);
-    }
-
     public void registerConsole(String id, String title, double price, int stockquantity, String brand, String model, String generation){
         Console console = new Console(id, title, price, stockquantity, brand, model, generation);
         List<Product> products = repository.loadAll();
