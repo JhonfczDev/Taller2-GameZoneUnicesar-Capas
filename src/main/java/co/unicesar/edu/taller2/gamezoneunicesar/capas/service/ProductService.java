@@ -1,6 +1,6 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.repository.ProductRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ProductRepository;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.VideoGame;
@@ -15,22 +15,18 @@ public class ProductService {
         this.repository = repository;
     }
 
-    public void registerProduct(String id, String title, double price, int stockquantity, String platform, String genre, String ageRating){
-        VideoGame videoGame = new VideoGame(id, title, price, stockquantity, platform, genre, ageRating);
-        List<Product> products = repository.loadAll();
-        products.add(videoGame);
-        repository.saveAll(products);
-    }
-
     public void registerConsole(String id, String title, double price, int stockquantity, String brand, String model, String generation){
-        Console console = new Console(id, title, price, stockquantity, brand, model, generation);
+        Console c = new Console(id, title, price, stockquantity, brand, model, generation);
         List<Product> products = repository.loadAll();
-        products.add(console);
+        products.add(c);
         repository.saveAll(products);
     }
 
-    public List<Product> getAllProducts() {
-        return repository.loadAll();
+    public void registerVideoGame(String id, String title, double price, int stockquantity, String platform, String genre, String ageRating){
+        VideoGame vg = new VideoGame(id, title, price, stockquantity, platform, genre, ageRating);
+        List<Product> products = repository.loadAll();
+        products.add(vg);
+        repository.saveAll(products);
     }
 
     public List<Product> getAllProducts(){
