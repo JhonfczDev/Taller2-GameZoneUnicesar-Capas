@@ -14,8 +14,6 @@ public abstract class Warranty {
         this.id = id;
     }
 
-    public abstract String getWarrantyCost();
-
     public String getId() {
         return id;
     }
