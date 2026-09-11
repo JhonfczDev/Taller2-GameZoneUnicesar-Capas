@@ -23,14 +23,21 @@ public class PersonService {
     }
 
     /**
-     * Registers a new customer: loads the current list of people,
-     * adds the new customer, and saves the updated full list.
-     * @param c the customer to register
+     * Registers a new customer in the repository.
+     * Creates a new {@link Customer} with the provided data, adds it to the
+     * existing list of persons retrieved from the repository, and persists
+     * the updated list.
+     * @param id the unique identifier of the customer
+     * @param name the customer's name
+     * @param phone the customer's phone number
+     * @param email the customer's email address
+     * @throws RuntimeException if an error occurs while saving the data
      */
-    public void registerCustomer(Customer c) {
+    public void registerCustomer(String id, String name, String phone, String email) {
+        Customer customer = new Customer(id, name, phone, email);
         List<Person> persons = repository.loadAll();
 
-        persons.add(c);
+        persons.add(customer);
         repository.saveAll(persons);
     }
 
