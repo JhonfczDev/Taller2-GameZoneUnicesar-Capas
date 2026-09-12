@@ -13,9 +13,9 @@ classDiagram
 
         class Customer {
             -String email
-            -List<Sale> purchaseHistory
+            -List~Sale~ purchaseHistory
             +getEmail() String
-            +getPurchaseHistory() List<Sale>
+            +getPurchaseHistory() List~Sale~
             +addPurchas(Sale sale) void
         }
 
@@ -32,9 +32,13 @@ classDiagram
             -String title
             -double price
             -int stockQuantity
+            +Product(String id, String title, double price, int stockQuantity)
             +getId() String
+            +setId(String id) void
             +getTitle() String
+            +setTitle(String title) void
             +getPrice() double
+            +setPrice(double price) void
             +getStockQuantity() int
             +setStockQuantity(int quantity) void
             +getDescription() String
@@ -44,6 +48,13 @@ classDiagram
             -String platform
             -String genre
             -String ageRating
+            +VideoGame(String id, String title, double price, int stockQuantity, String platform, String genre, String ageRating)
+            +getPlatform() String
+            +setPlatform(String platform) void
+            +getGenre() String
+            +setGenre(String genre) void
+            +getAgeRating() String
+            +setAgeRating(String ageRating) void
             +getDescription() String
         }
 
@@ -51,19 +62,36 @@ classDiagram
             -String brand
             -String model
             -String generation
+            +Console(String id, String title, double price, int stockQuantity, String brand, String model, String generation)
+            +getBrand() String
+            +setBrand(String brand) void
+            +getModel() String
+            +setModel(String model) void
+            +getGeneration() String
+            +setGeneration(String generation) void
             +getDescription() String
         }
 
         class Sale {
             -String id
-            -String date
+            -LocalDate date
             -Customer customer
             -Seller seller
             -List~Product~ products
-            +calculateTotal() double
-            +getProducts() List~Product~
+            +Sale(String id, LocalDate date, Customer customer, Seller seller, List~Product~ products)
+            +getId() String
+            +getDate() LocalDate
             +getCustomer() Customer
             +getSeller() Seller
+            +getProducts() List~Product~
+            +setId(String id) void
+            +setDate(LocalDate date) void
+            +setCustomer(Customer customer) void
+            +setSeller(Seller seller) void
+            +setProducts(List~Product~ products) void
+            +calculateTotal() double
+            +addProduct(Product product) void
+            +printSale() String
         }
     }
 
@@ -74,14 +102,17 @@ classDiagram
 
     Sale "0..*" --> "1" Customer
     Sale "0..*" --> "1" Seller
-    Sale "1" o-- "1..*" Product
+    Sale o-- Product : 1..*
 
     namespace Service {
         class ProductService {
             -ProductRepository repository
-            +registerProduct(Product p) void
+            +ProductService(ProductRepository repository)
+            +registerProduct(String id, String title, double price, int stockquantity, String platform, String genre, String ageRating) void
+            +registerConsole(String id, String title, double price, int stockquantity, String brand, String model, String generation) void
             +getAllProducts() List~Product~
-            +updateStock(String id, int qty) void
+            +findById(String id) Product
+            +update(Product product) void
         }
 
         class PersonService {
@@ -89,23 +120,34 @@ classDiagram
             +registerCustomer(Customer c) void
             +getAllCustomers() List~Customer~
             +getAllSellers() List~Seller~
+            -initializeDefaultSellers() void
         }
 
         class SaleService {
-            -SaleRepository saleRepo
+            -SaleRepository saleRepository
             -ProductService productService
-            +registerSale(Sale s) void
+            -PersonService personService
+            +SaleService(SaleRepository saleRepository, ProductService productService, PersonService personService)
+            +registerSale(String customerId, String sellerId, List~String~ productIds) void
             +getAllSales() List~Sale~
             +getSalesByCustomer(String customerId) List~Sale~
             +getSalesBySeller(String sellerId) List~Sale~
+            -buildSaleFromLine(String line) Sale
+            -buildSale(String id, LocalDate date, String customerId, String sellerId, List~String~ productIds) Sale
+            -generateSaleId() String
         }
     }
 
     namespace Persistence {
         class ProductRepository {
             -File file
+            +ProductRepository()
+            +ProductRepository(String filePath)
             +saveAll(List~Product~ products) void
             +loadAll() List~Product~
+            +findById(String id) Product
+            +update(Product product) void
+            -ensureFileExists() void
         }
 
         class PersonRepository {
@@ -115,18 +157,38 @@ classDiagram
         }
 
         class SaleRepository {
-            -String filePath
+            -String FILE_PATH
+            -String DELIMITER
+            -String PRODUCT_SEPARATOR
+            +SaleRepository()
+            +save(Sale sale) void
             +saveAll(List~Sale~ sales) void
-            +loadAll() List~Sale~
+            +findAllLines() List~String~
+            -toLine(Sale sale) String
+            -ensureFileExists() void
         }
     }
 
     namespace UI {
-        class ConsoleMenu {
-            -ProductService productService
-            -PersonService personService
+        class UI {
+            -Scanner scanner
             -SaleService saleService
-            +start() void
+            -PersonService personService
+            -ProductService productService
+            +launch() void
+            +productMenu() void
+            +personMenu() void
+            +saleMenu() void
+            +registerVideoGame() void
+            +registerConsole() void
+            +listAllProducts() void
+            +registerCustomer() void
+            +listAllCustomers() void
+            +listAllSellers() void
+            +registerSale() void
+            +listAllSales() void
+            +salesByClient() void
+            +salesBySeller() void
         }
     }
 
@@ -134,7 +196,7 @@ classDiagram
     PersonService --> PersonRepository
     SaleService --> SaleRepository
     SaleService --> ProductService
-    ConsoleMenu --> ProductService
-    ConsoleMenu --> PersonService
-    ConsoleMenu --> SaleService
-```
+    SaleService --> PersonService
+    UI --> ProductService
+    UI --> PersonService
+    UI --> SaleService
