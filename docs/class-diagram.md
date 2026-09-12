@@ -108,7 +108,7 @@ classDiagram
         class ProductService {
             -ProductRepository repository
             +ProductService(ProductRepository repository)
-            +registerProduct(String id, String title, double price, int stockquantity, String platform, String genre, String ageRating) void
+            +registerVideoGame(String id, String title, double price, int stockquantity, String platform, String genre, String ageRating) void
             +registerConsole(String id, String title, double price, int stockquantity, String brand, String model, String generation) void
             +getAllProducts() List~Product~
             +findById(String id) Product
