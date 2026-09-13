@@ -56,4 +56,24 @@ public class AccessoryService {
 
         return result;
     }
+
+    public List<Accessory> getCompatibleAccessories(String consoleId) {
+        List<Accessory> result = new ArrayList<>();
+
+        for (Accessory accessory : repository.loadAll()) {
+            if (accessory instanceof Controller) {
+                Controller controller = (Controller) accessory;
+                if (controller.getCompatibleConsoleIds().contains(consoleId)) {
+                    result.add(controller);
+                }
+            } else if (accessory instanceof Memory) {
+                Memory memory = (Memory) accessory;
+                if (memory.getCompatibleConsoleIds().contains(consoleId)) {
+                    result.add(memory);
+                }
+            }
+        }
+
+        return result;
+    }
 }
