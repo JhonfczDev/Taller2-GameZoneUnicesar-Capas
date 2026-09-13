@@ -138,6 +138,15 @@ public class AccessoryRepository {
         return accessories;
     }
 
+    public Accessory findById(String id) {
+        for (Accessory accessory : loadAll()) {
+            if (accessory.getId().equals(id)) {
+                return accessory;
+            }
+        }
+        return null;
+    }
+
     private String joinConsoleIds(List<String> consoleIds) {
         if (consoleIds == null || consoleIds.isEmpty()) {
 
