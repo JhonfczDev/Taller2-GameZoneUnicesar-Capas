@@ -1,8 +1,8 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Customer;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Person;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Controller;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Cable;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Memory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,12 +20,65 @@ public class AccessoryRepository {
         ensureFileExists();
     }
 
+    public void saveAll(List<Accessory> Accessories){
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (Accessory accessory: accessories) {
+
+                if (accessory instanceof Controller) {
+                    Controller controller = (Controller) accessory;
+                    String line = "CONTROLLER,"
+                            + controller.getId() + ","
+                            + controller.getTitle() + ","
+                            + controller.getPrice() + ","
+                            + controller.getStockQuantity() + ","
+                            + joinConsoleIds(memory.getCompatibleConsoleIds());
+
+                    writer.write(line);
+                    writer.newLine();
+
+                } else if (accessory instanceof Cable) {
+                    Cable cable = (Cable) accessory;
+
+                    String line = "CABLE,"
+                            + cable.getId() + ","
+                            + cable.getTitle() + ","
+                            + cable.getPrice() + ","
+                            + cable.getStockQuantity() + ","
+                            + cable.getLengthInMeters() + ","
+                            + cable.getConnectorType();
+
+                    writer.write(line);
+                    writer.newLine();
+
+                } else if (accessory instanceof Memory) {
+                    Memory memory = (Memory) accessory;
+
+                    String line = "MEMORY,"
+                            + memory.getId() + ","
+                            + memory.getTitle() + ","
+                            + memory.getPrice() + ","
+                            + memory.getStockQuantity() + ","
+                            + memory.getCapacityInGigabytes() + ","
+                            + memory.getMemoryType() + ","
+                            + joinConsoleIds(memory.getCompatibleConsoleIds());
+
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error saving accessories...", e);
+        }
+    }
+
     private String joinConsoleIds(List<String> consoleIds) {
         if (consoleIds == null || consoleIds.isEmpty()) {
 
             return "";
         }
-        
+
         return String.join("|", consoleIds);
     }
 
