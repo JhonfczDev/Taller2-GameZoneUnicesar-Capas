@@ -9,5 +9,21 @@ public class AccessoryRepository {
 
     public AccessoryRepository(String filePath) {
         this.file = new File(filePath);
+        ensureFileExists();
+    }
+
+    private void ensureFileExists() {
+        if (!file.exists()) {
+            try {
+                File parent = file.getParentFile();
+
+                if (parent != null &&  !parent.exists()) {parent.mkdirs();}
+
+                if (!file.exists()) {file.createNewFile();}
+                
+            } catch (Exception e) {
+                throw new RuntimeException("Error creating accessories file", e);
+            }
+        }
     }
 }
