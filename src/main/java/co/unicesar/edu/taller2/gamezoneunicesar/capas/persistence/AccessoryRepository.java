@@ -1,17 +1,15 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Controller;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Cable;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Memory;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AccessoryRepository {
     private File file;
+
+    private static final String CONSOLE_SEPARATOR = "\\|";
 
     public AccessoryRepository() {this("data/accessories.csv");}
 
@@ -71,6 +69,73 @@ public class AccessoryRepository {
         } catch (IOException e) {
             throw new RuntimeException("Error saving accessories...", e);
         }
+    }
+
+    public List<Accessory> loadAll(){
+
+        List<Accessory> accessories = new ArrayList<>();
+
+        if (!file.exists()) {
+            return accessories;
+
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                if (line.trim().isEmpty()) continue;
+
+                String[] data = line.split(",");
+
+                if (data[0].equals("CONTROLLER")) {
+
+                    Controller controller = new Controller(
+                            data[1],
+                            data[2],
+                            Double.parseDouble(data[3]),
+                            Integer.parseInt(data[4]),
+                            Double.parseDouble(data[5]),
+                            data[6]
+                    );
+
+                    accessories.add(controller);
+
+                } else if (data[0].equals("CABLE")) {
+
+                    Cable cable = new Cable(
+                            data[1],
+                            data[2],
+                            Double.parseDouble(data[3]),
+                            Integer.parseInt(data[4]),
+                            Double.parseDouble(data[5]),
+                            data[6]
+                    );
+
+                    accessories.add(cable);
+
+                } else if (data[0].equals("MEMORY")) {
+
+                    Memory memory = new Memory(
+                            data[1],
+                            data[2],
+                            Double.parseDouble(data[3]),
+                            Integer.parseInt(data[4]),
+                            Integer.parseInt(data[5]),
+                            data[6],
+                            splitConsoleIds(data.length > 7 ? data[7] : "")
+                    );
+
+                    accessories.add(memory);
+                }
+            }
+        } catch (IOException e) {
+
+            throw new RuntimeException("Error loading accessories...", e);
+        }
+
+        return accessories;
     }
 
     private String joinConsoleIds(List<String> consoleIds) {
