@@ -30,6 +30,7 @@ public class AccessoryRepository {
                             + controller.getTitle() + ","
                             + controller.getPrice() + ","
                             + controller.getStockQuantity() + ","
+                            + controller.getConnectionType() + ","
                             + joinConsoleIds(memory.getCompatibleConsoleIds());
 
                     writer.write(line);
