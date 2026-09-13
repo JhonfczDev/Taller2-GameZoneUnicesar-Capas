@@ -40,4 +40,8 @@ public class AccessoryService {
         accessories.add(accessory);
         repository.saveAll(accessories);
     }
+
+    public List<Accessory> getAllAccessories() {
+        return repository.loadAll();
+    }
 }
