@@ -76,4 +76,8 @@ public class AccessoryService {
 
         return result;
     }
+
+    public Accessory findById(String id) {
+        return repository.findById(id);
+    }
 }
