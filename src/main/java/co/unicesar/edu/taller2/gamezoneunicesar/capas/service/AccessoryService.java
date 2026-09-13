@@ -80,4 +80,8 @@ public class AccessoryService {
     public Accessory findById(String id) {
         return repository.findById(id);
     }
+
+    public boolean hasStock(Accessory accessory) {
+        return accessory != null && accessory.getStockQuantity() > 0;
+    }
 }
