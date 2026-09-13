@@ -82,6 +82,19 @@ public class AccessoryRepository {
         return String.join("|", consoleIds);
     }
 
+    private List<String> splitConsoleIds(String rawField) {
+        List<String> consoleIds = new ArrayList<>();
+        if (rawField == null || rawField.isBlank()) {
+            return consoleIds;
+        }
+        for (String consoleId : rawField.split(CONSOLE_SEPARATOR)) {
+            if (!consoleId.isBlank()) {
+                consoleIds.add(consoleId.trim());
+            }
+        }
+        return consoleIds;
+    }
+
     private void ensureFileExists() {
         if (!file.exists()) {
             try {
