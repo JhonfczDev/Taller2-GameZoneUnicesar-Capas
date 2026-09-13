@@ -44,4 +44,16 @@ public class AccessoryService {
     public List<Accessory> getAllAccessories() {
         return repository.loadAll();
     }
+
+    public List<Accessory> getAccessoriesByType(String accessoryType) {
+        List<Accessory> result = new ArrayList<>();
+
+        for (Accessory accessory : repository.loadAll()) {
+            if (accessory.getAccessoryType().equalsIgnoreCase(accessoryType)) {
+                result.add(accessory);
+            }
+        }
+
+        return result;
+    }
 }
