@@ -16,6 +16,7 @@ public class AccessoryRepository {
     public AccessoryRepository(String filePath) {
         this.file = new File(filePath);
         ensureFileExists();
+        initializeDefaultAccessories();
     }
 
     public void saveAll(List<Accessory> Accessories){
@@ -183,5 +184,50 @@ public class AccessoryRepository {
                 throw new RuntimeException("Error creating accessories file", e);
             }
         }
+    }
+
+    private void initializeDefaultAccessories() {
+        if (file.exists() && file.length() > 0) {
+            
+            return;
+        }
+
+        List<Accessory> defaultAccessories = new ArrayList<>();
+
+        defaultAccessories.add(
+                new Controller(
+                        "AC001",
+                        "Wireless remote Pro",
+                        180000.0,
+                        15,
+                        "WIRELESS",
+                        new ArrayList<>(List.of("CON001"))
+                )
+        );
+
+        defaultAccessories.add(
+                new Cable(
+                        "AC002",
+                        "Cable HDMI 2.1",
+                        45000.0,
+                        30,
+                        1.8,
+                        "HDMI"
+                )
+        );
+
+        defaultAccessories.add(
+                new Memory(
+                        "AC003",
+                        "Card MicroSD 128GB",
+                        95000.0,
+                        20,
+                        128,
+                        "MICRO_SD",
+                        new ArrayList<>(List.of("CON001"))
+                )
+        );
+
+        saveAll(defaultAccessories);
     }
 }
