@@ -10,6 +10,18 @@ public class AccessoryService {
         this.repository = repository;
     }
 
+    public void registerController(Controller controller) {
+        registerAccessory(controller);
+    }
+
+    public void registerCable(Cable cable) {
+        registerAccessory(cable);
+    }
+
+    public void registerMemory(Memory memory) {
+        registerAccessory(memory);
+    }
+
     private void registerAccessory(Accessory accessory) {
         if (accessory == null) {
             throw new IllegalArgumentException("the accessory cannot be null.");
