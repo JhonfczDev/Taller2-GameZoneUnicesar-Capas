@@ -84,4 +84,28 @@ public class AccessoryService {
     public boolean hasStock(Accessory accessory) {
         return accessory != null && accessory.getStockQuantity() > 0;
     }
+
+    public void update(Accessory accessory) {
+        if (accessory == null) {
+            throw new IllegalArgumentException("The accessory cannot be null.");
+        }
+
+        List<Accessory> accessories = repository.loadAll();
+        boolean found = false;
+
+        for (int i = 0; i < accessories.size(); i++) {
+            if (accessories.get(i).getId().equals(accessory.getId())) {
+                accessories.set(i, accessory);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            throw new IllegalArgumentException(
+                    "No accessory was found with the id: " + accessory.getId());
+        }
+
+        repository.saveAll(accessories);
+    }
 }
