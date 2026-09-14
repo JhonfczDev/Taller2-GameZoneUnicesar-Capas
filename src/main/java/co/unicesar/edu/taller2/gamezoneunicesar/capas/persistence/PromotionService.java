@@ -1,5 +1,7 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
+import java.time.LocalDate;
+
 public class PromotionService {
 
     private PromotionRepository repository;
@@ -43,5 +45,19 @@ public class PromotionService {
 
     public List<Promotion> listAllPromotions() {
         return repository.loadAll();
+    }
+
+    public List<Promotion> listActivePromotions() {
+        List<Promotion> active = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (Promotion promotion : repository.loadAll()) {
+            if (promotion.isActive(today)) {
+
+                active.add(promotion);
+            }
+        }
+
+        return active;
     }
 }
