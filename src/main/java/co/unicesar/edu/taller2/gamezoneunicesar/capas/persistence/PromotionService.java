@@ -29,4 +29,15 @@ public class PromotionService {
 
         repository.saveAll(promotions);
     }
+
+    public void registerBulkPurchaseDiscount(String id, String name, LocalDate startDate,
+                                             LocalDate endDate, int minQuantity, double percentage) {
+
+        BulkPurchaseDiscount promotion = new BulkPurchaseDiscount(id, name, startDate, endDate, minQuantity, percentage);
+        List<Promotion> promotions = repository.loadAll();
+
+        promotions.add(promotion);
+
+        repository.saveAll(promotions);
+    }
 }
