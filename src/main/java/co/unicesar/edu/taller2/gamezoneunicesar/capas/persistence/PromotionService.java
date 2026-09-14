@@ -40,4 +40,8 @@ public class PromotionService {
 
         repository.saveAll(promotions);
     }
+
+    public List<Promotion> listAllPromotions() {
+        return repository.loadAll();
+    }
 }
