@@ -75,4 +75,15 @@ public class PromotionService {
 
         return best;
     }
+
+    public Promotion findById(String id) {
+        for (Promotion promotion: repository.loadAll()) {
+            if (promotion.getId().equals(id)) {
+                
+                return promotion;
+            }
+        }
+
+        return null;
+    }
 }
