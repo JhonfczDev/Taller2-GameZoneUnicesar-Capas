@@ -60,4 +60,19 @@ public class PromotionService {
 
         return active;
     }
+
+    public Promotion findBestPromotionFor(Sale sale) {
+        Promotion best = null;
+        double maxDiscount = 0.0;
+
+        for (Promotion promotion : listActivePromotions()) {
+            double discount = promotion.calculateDiscount(sale);
+            if (discount > maxDiscount) {
+                maxDiscount = discount;
+                best = promotion;
+            }
+        }
+
+        return best;
+    }
 }
