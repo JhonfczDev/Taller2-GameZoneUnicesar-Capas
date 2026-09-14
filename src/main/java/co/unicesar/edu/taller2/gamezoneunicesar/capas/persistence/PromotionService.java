@@ -10,8 +10,19 @@ public class PromotionService {
 
     public void registerPercentageDiscount(String id, String name, LocalDate startDate,
                                            LocalDate endDate, double percentage) {
-        
+
         PercentageDiscount promotion = new PercentageDiscount(id, name, startDate, endDate, percentage);
+        List<Promotion> promotions = repository.loadAll();
+
+        promotions.add(promotion);
+
+        repository.saveAll(promotions);
+    }
+
+    public void registerCategoryDiscount(String id, String name, LocalDate startDate,
+                                         LocalDate endDate, double percentage, String targetCategory) {
+
+        CategoryDiscount promotion = new CategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
         List<Promotion> promotions = repository.loadAll();
 
         promotions.add(promotion);
