@@ -1,7 +1,10 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
-import java.io.File;
-import java.io.IOException;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Return;
+
+import java.io.*;
+import java.util.List;
 
 public class ReturnRepository {
 
@@ -25,6 +28,38 @@ public class ReturnRepository {
             }
         } catch (IOException e) {
             System.err.println("Error creating the returns file: " + e.getMessage());
+        }
+    }
+
+    public void saveAll(List<Return> returns){
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (Return returnItem : returns) {
+
+                StringBuilder productIds = new StringBuilder();
+                List<Product> returnedProducts = returnItem.getReturnedProducts();
+
+                for (int i = 0; i < returnedProducts.size(); i++) {
+                    productIds.append(returnedProducts.get(i).getId());
+                    if (i < returnedProducts.size() - 1) {
+                        productIds.append("|");
+                    }
+                }
+
+                String line = returnItem.getId() + ","
+                        + returnItem.getReturnDate() + ","
+                        + returnItem.getOriginalSale().getId() + ","
+                        + productIds + ","
+                        + returnItem.getReason() + ","
+                        + returnItem.getRefundAmount();
+
+                writer.write(line);
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+
+            throw new RuntimeException("Error saving returns...", e);
         }
     }
 }
