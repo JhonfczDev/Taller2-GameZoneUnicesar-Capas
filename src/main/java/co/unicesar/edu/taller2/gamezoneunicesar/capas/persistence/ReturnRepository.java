@@ -2,8 +2,13 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Return;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReturnRepository {
@@ -61,5 +66,58 @@ public class ReturnRepository {
 
             throw new RuntimeException("Error saving returns...", e);
         }
+    }
+
+    public List<Return> loadAll(){
+
+        List<Return> returns = new ArrayList<>();
+
+        if (!file.exists()) {
+            
+            return returns;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                if (line.trim().isEmpty()) continue;
+
+                String[] data = line.split(",", -1);
+
+                String id = data[0];
+                LocalDate returnDate = LocalDate.parse(data[1]);
+                String saleId = data[2];
+                String productIdsField = data[3];
+                String reason = data[4];
+
+                Sale originalSale = SaleService.findById(saleId);
+                if (originalSale == null) {
+
+                    continue;
+                }
+
+                List<Product> returnedProducts = new ArrayList<>();
+                if (!productIdsField.isEmpty()) {
+                    for (String productId : productIdsField.split("\\|")) {
+                        Product product = ProductService.findById(productId);
+                        if (product != null) {
+                            returnedProducts.add(product);
+                        }
+                    }
+                }
+
+                Return returnItem = new Return(id, returnDate, originalSale, returnedProducts, reason);
+                returnItem.calculateRefundAmount();
+
+                returns.add(returnItem);
+            }
+        } catch (IOException e) {
+
+            throw new RuntimeException("Error loading returns...", e);
+        }
+
+        return returns;
     }
 }
