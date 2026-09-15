@@ -32,13 +32,9 @@ classDiagram
             -String title
             -double price
             -int stockQuantity
-            +Product(String id, String title, double price, int stockQuantity)
             +getId() String
-            +setId(String id) void
             +getTitle() String
-            +setTitle(String title) void
             +getPrice() double
-            +setPrice(double price) void
             +getStockQuantity() int
             +setStockQuantity(int quantity) void
             +getDescription() String
@@ -48,13 +44,6 @@ classDiagram
             -String platform
             -String genre
             -String ageRating
-            +VideoGame(String id, String title, double price, int stockQuantity, String platform, String genre, String ageRating)
-            +getPlatform() String
-            +setPlatform(String platform) void
-            +getGenre() String
-            +setGenre(String genre) void
-            +getAgeRating() String
-            +setAgeRating(String ageRating) void
             +getDescription() String
         }
 
@@ -62,13 +51,6 @@ classDiagram
             -String brand
             -String model
             -String generation
-            +Console(String id, String title, double price, int stockQuantity, String brand, String model, String generation)
-            +getBrand() String
-            +setBrand(String brand) void
-            +getModel() String
-            +setModel(String model) void
-            +getGeneration() String
-            +setGeneration(String generation) void
             +getDescription() String
         }
 
@@ -107,12 +89,9 @@ classDiagram
     namespace Service {
         class ProductService {
             -ProductRepository repository
-            +ProductService(ProductRepository repository)
-            +registerVideoGame(String id, String title, double price, int stockquantity, String platform, String genre, String ageRating) void
-            +registerConsole(String id, String title, double price, int stockquantity, String brand, String model, String generation) void
+            +registerProduct(Product p) void
             +getAllProducts() List~Product~
-            +findById(String id) Product
-            +update(Product product) void
+            +updateStock(String id, int qty) void
         }
 
         class PersonService {
@@ -141,13 +120,8 @@ classDiagram
     namespace Persistence {
         class ProductRepository {
             -File file
-            +ProductRepository()
-            +ProductRepository(String filePath)
             +saveAll(List~Product~ products) void
             +loadAll() List~Product~
-            +findById(String id) Product
-            +update(Product product) void
-            -ensureFileExists() void
         }
 
         class PersonRepository {
@@ -200,3 +174,4 @@ classDiagram
     UI --> ProductService
     UI --> PersonService
     UI --> SaleService
+```
