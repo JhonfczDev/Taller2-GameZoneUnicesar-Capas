@@ -17,6 +17,40 @@ public class ReturnService {
         this.repository = repository;
     }
 
+    public Return registerReturn(String saleId, List<String> productIds, String reason) {
+        if (productIds == null || productIds.isEmpty()) {
+            throw new IllegalArgumentException("A return must include at least one product");
+        }
+
+        Sale originalSale = findSaleById(saleId);
+        if (originalSale == null) {
+            throw new IllegalArgumentException("No sale was found with the id: " + saleId);
+        }
+
+        if (!originalSale.canBeReturned()) {
+            throw new IllegalArgumentException("The 30-day period to return this sale has already expired");
+        }
+
+        List<Product> returnedProducts = resolveReturnedProducts(originalSale, productIds);
+
+        String returnId = generateReturnId();
+        LocalDate today = LocalDate.now();
+
+        Return newReturn = new Return(returnId, today, originalSale, returnedProducts, reason);
+        newReturn.calculateRefundAmount();
+
+        for (Product product : returnedProducts) {
+            ProductService.restoreStock(product.getId(), 1);
+        }
+
+        List<Return> returns = repository.loadAll();
+
+        returns.add(newReturn);
+        repository.saveAll(returns);
+
+        return newReturn;
+    }
+
     private Sale findSaleById(String saleId) {
         for (Sale sale : SaleService.getAllSales()) {
             if (sale.getId().equals(saleId)) {
