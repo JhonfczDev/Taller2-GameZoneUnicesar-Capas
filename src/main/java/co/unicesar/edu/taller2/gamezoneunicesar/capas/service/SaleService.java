@@ -17,7 +17,8 @@ import java.util.UUID;
  * <p>
  * This service coordinates sale registration and retrieval by
  * delegating persistence to {@link SaleRepository}, product lookups
- * and stock updates to {@link ProductService}, and customer/seller
+ * and stock updates to {@link ProductService}, accessory lookups and 
+ * updates to {@link AccessoryService}, and customer/seller
  * lookups to {@link PersonService}.
  * </p>
  */
@@ -32,6 +33,7 @@ public class SaleService {
     /** Service used to look up customers and sellers. */
     private final PersonService personService;
     
+    /** Service used to look up and update accessories. */
     private final AccessoryService accessoryService;
  
     /**
@@ -40,6 +42,7 @@ public class SaleService {
      * @param saleRepository repository used to persist and retrieve sales
      * @param productService service used to look up and update products
      * @param personService  service used to look up customers and sellers
+     * @param accessoryService service used to look up and update accessories
      */
     public SaleService(SaleRepository saleRepository,
                        ProductService productService,
@@ -108,16 +111,15 @@ public class SaleService {
         Sale sale = new Sale(saleId, LocalDate.now(), customer, seller, products);
         
         for (Product product : products) {
-            product.setStockQuantity(product.getStockQuantity()-1);
-            if(product instanceof Accessory){
-                accessoryService.update(product);
-            }else{
+            product.setStockQuantity(product.getStockQuantity() - 1);
+            if (product instanceof Accessory) {
+                accessoryService.update((Accessory) product);
+            } else {
                 productService.update(product);
             }
         }
         
         saleRepository.save(sale);
-        
     }
  
     /**
@@ -269,8 +271,6 @@ public class SaleService {
                 product = (Product) accessoryService.findById(productId);
             }
             
-            
-            
             if (product != null) {
                 products.add(product);
             }
@@ -288,8 +288,4 @@ public class SaleService {
     private String generateSaleId() {
         return "S" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
-    
-    
-    
-    
 }
