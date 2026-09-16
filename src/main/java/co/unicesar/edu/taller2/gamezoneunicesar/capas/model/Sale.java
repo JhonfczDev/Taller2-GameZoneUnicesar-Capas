@@ -4,6 +4,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.temporal.ChronoUnit;
  
 /**
  * Represents a sale made within the GameZone Unicesar system.
@@ -198,5 +199,19 @@ public class Sale {
         sb.append("  total: ").append(calculateTotal());
         return sb.toString();
     }
- 
+
+    /**
+ * Validates if the sale can accept a return on the given date.
+ *
+ * @param returnDate The date on which the return is attempted.
+ * @return true if the difference is between 0 and 30 calendar days.
+ */
+
+    public boolean canBeReturned(LocalDate returnDate){
+        if (returnDate == null || this.date == null){
+            return false;
+        }
+        long daysBetween = ChronoUnit.DAYS.between(this.date, returnDate);
+        return daysBetween >= 0 && daysBetween <= 30;
+    }
 }
