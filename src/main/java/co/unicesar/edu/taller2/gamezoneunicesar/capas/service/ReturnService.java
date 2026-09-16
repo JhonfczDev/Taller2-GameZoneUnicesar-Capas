@@ -79,6 +79,27 @@ public class ReturnService {
         return result;
     }
 
+    public double generateMonthlyBalance(int month, int year) {
+        double totalSales = 0.0;
+        for (Sale sale : saleService.getAllSales()) {
+            LocalDate saleDate = sale.getDate();
+            if (saleDate.getMonthValue() == month && saleDate.getYear() == year) {
+                totalSales += sale.getTotal();
+            }
+        }
+
+        double totalReturns = 0.0;
+        for (Return returnItem : repository.loadAll()) {
+            LocalDate returnDate = returnItem.getReturnDate();
+            
+            if (returnDate.getMonthValue() == month && returnDate.getYear() == year) {
+                totalReturns += returnItem.getRefundAmount();
+            }
+        }
+
+        return totalSales - totalReturns;
+    }
+
     private Sale findSaleById(String saleId) {
         for (Sale sale : SaleService.getAllSales()) {
             if (sale.getId().equals(saleId)) {
