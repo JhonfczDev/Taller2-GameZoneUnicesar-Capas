@@ -1,9 +1,13 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.BasicWarranty;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.ExtendedWarranty;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Warranty;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
 
 import java.io.*;
+import java.util.*;
 
 public class WarrantyRepository {
 
@@ -33,6 +37,38 @@ public class WarrantyRepository {
             }
         } catch (IOException e) {
             System.err.println("Error creating the warranties file: " + e.getMessage());
+        }
+    }
+
+    public void saveAll(List<Warranty> warranties) {
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (Warranty warranty : warranties) {
+
+                String type = "";
+
+                if (warranty instanceof BasicWarranty) {
+                    type = "BASIC";
+                } else if (warranty instanceof ExtendedWarranty) {
+                    type = "EXTENDED";
+                } else {
+                    
+                    continue;
+                }
+
+                String line = type + ","
+                        + warranty.getId() + ","
+                        + warranty.getProduct().getId() + ","
+                        + warranty.getSale().getId() + ","
+                        + warranty.getStartDate();
+
+                writer.write(line);
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+
+            throw new RuntimeException("Error saving warranties...", e);
         }
     }
 }
