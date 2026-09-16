@@ -18,8 +18,13 @@ public class CategoryDiscount extends Discount {
         
         // null validation for products list
         for (Product product : sale.getProducts()) {
-            if (product != null && product.targetCategory().equalsIgnoreCase(product.getCategory())) {
-                categoryTotal += product.getPrice();
+            if (product != null) {
+                // Get derived class name
+                String productClassName = product.getClass().getSimpleName();
+                
+                if (productClassName.equalsIgnoreCase(this.targetCategory)) {
+                    categoryTotal += product.getPrice();
+                }
             }
         }
         return categoryTotal * (this.percentage / 100);
