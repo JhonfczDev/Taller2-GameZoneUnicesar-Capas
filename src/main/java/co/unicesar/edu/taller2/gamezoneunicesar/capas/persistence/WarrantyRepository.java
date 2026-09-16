@@ -19,5 +19,20 @@ public class WarrantyRepository {
         this.file = new File(fileName);
         this.saleService = saleService;
         this.productService = productService;
+        ensureFileExists();
+    }
+
+    private void ensureFileExists() {
+        try {
+            File parent = file.getParentFile();
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs();
+            }
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (IOException e) {
+            System.err.println("Error creating the warranties file: " + e.getMessage());
+        }
     }
 }
