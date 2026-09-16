@@ -7,6 +7,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ReturnReposito
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ReturnService {
 
@@ -48,5 +49,9 @@ public class ReturnService {
         }
 
         return returnedProducts;
+    }
+
+    private String generateReturnId() {
+        return "R" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }
