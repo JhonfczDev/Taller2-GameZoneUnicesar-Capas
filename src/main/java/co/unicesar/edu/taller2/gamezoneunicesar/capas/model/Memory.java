@@ -1,10 +1,10 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.model;
 
-public class Storage extends Accessory {
+public class Memory extends Accessory {
     private int capacityGB;
     private String memoryType;
 
-    public Storage(String id, String title, double price, int stockQuantity, int capacityGB, String memoryType) {
+    public Memory(String id, String title, double price, int stockQuantity, int capacityGB, String memoryType) {
         super(id, title, price, stockQuantity);
         this.capacityGB = capacityGB;
         this.memoryType = memoryType;
