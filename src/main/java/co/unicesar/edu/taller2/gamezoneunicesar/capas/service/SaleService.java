@@ -170,7 +170,7 @@ public class SaleService {
      *
      * @return the list of all persisted sales; empty if none are stored
      */
-    public List<Sale> getAllSales() {
+    public static List<Sale> getAllSales() {
         List<Sale> sales = new ArrayList<>();
  
         for (String line : saleRepository.findAllLines()) {
