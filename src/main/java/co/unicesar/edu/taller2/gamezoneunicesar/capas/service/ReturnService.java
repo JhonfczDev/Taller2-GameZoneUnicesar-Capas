@@ -51,6 +51,10 @@ public class ReturnService {
         return newReturn;
     }
 
+    public List<Return> viewAllReturns() {
+        return repository.loadAll();
+    }
+
     private Sale findSaleById(String saleId) {
         for (Sale sale : SaleService.getAllSales()) {
             if (sale.getId().equals(saleId)) {
