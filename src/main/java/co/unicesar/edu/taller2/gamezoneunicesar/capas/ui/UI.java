@@ -66,6 +66,7 @@ public class UI {
             System.out.println("1. Gestion de productos");
             System.out.println("2. Gestion de personas");
             System.out.println("3. Gestion de ventas");
+            System.out.println("4. Gestion de accesorios");
             System.out.println("0. Salir de la aplicacion");
             System.out.print("Seleccione una opcion: ");
             String option = scanner.nextLine().trim();
@@ -77,6 +78,8 @@ public class UI {
                     personMenu();
                 case "3" ->
                     saleMenu();
+                case "4" ->
+                    accessoryMenu();
                 case "0" -> {
                     exit = true;
                     System.out.println("\n¡Gracias por usar GameZone Unicesar! Saliendo...");
@@ -504,6 +507,33 @@ public class UI {
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+    
+    public void accessoryMenu(){
+        boolean back = false;
+    while (!back) {
+        System.out.println("\n========== MENU DE ACCESORIOS ==========");
+        System.out.println("1. Registrar un nuevo control");
+        System.out.println("2. Registrar un nuevo cable");
+        System.out.println("3. Registrar una nueva memoria");
+        System.out.println("4. Listar todos los accesorios");
+        System.out.println("5. Listar accesorios por tipo");
+        System.out.println("6. Consultar accesorios compatibles con una consola");
+        System.out.println("0. Regresar al menu principal");
+        System.out.print("Seleccione una opcion: ");
+        String option = scanner.nextLine().trim();
+
+        switch (option) {
+            case "1" -> registerController();
+            case "2" -> registerCable();
+            case "3" -> registerMemory();
+            case "4" -> listAllAccessories();
+            case "5" -> listAccessoriesByType();
+            case "6" -> listAccessoriesCompatibleWithConsole();
+            case "0" -> back = true;
+            default -> System.out.println("Opcion invalida.");
+        }
+    }
     }
 
 
