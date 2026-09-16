@@ -12,7 +12,7 @@ public class Controller extends Accessory {
     public String getDescription() {
         return super.getDescription() + " | Tipo de conexión: " + connectionType;
     }
-}
+
 
     public String getConnectionType() {
         return connectionType;
