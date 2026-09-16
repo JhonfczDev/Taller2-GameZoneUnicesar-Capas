@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public abstract class Accessory extends Product {
-    private List<Console> compatibleConsoles;
+    private List<String> compatibleConsoles;
 
     public Accessory(String id, String title, double price, int stockQuantity){
         super(id, title, price, stockQuantity);
@@ -16,15 +16,15 @@ public abstract class Accessory extends Product {
                 + " | Stock: " + getStockQuantity() + " | Consolas compatibles: " + compatibleConsoles.size();
     }
 
-    public List<Console> getCompatibleConsoles() {
+    public List<String> getCompatibleConsoles() {
         return compatibleConsoles;
     }
 
-    public void setCompatibleConsoles(List<Console> compatibleConsoles) {
+    public void setCompatibleConsoles(List<String> compatibleConsoles) {
         this.compatibleConsoles = compatibleConsoles;
     }
 
-    public void addCompatibleConsole(Console console) {
+    public void addCompatibleConsole(String console) {
         compatibleConsoles.add(console);
     }
 }
