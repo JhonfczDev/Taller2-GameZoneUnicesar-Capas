@@ -5,6 +5,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ReturnRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReturnService {
@@ -31,5 +32,21 @@ public class ReturnService {
             }
         }
         return null;
+    }
+
+    private List<Product> resolveReturnedProducts(Sale originalSale, List<String> productIds) {
+        List<Product> saleProducts = originalSale.getProducts();
+        List<Product> returnedProducts = new ArrayList<>();
+
+        for (String productId : productIds) {
+            Product product = findProductInSale(saleProducts, productId);
+            if (product == null) {
+                throw new IllegalArgumentException(
+                        "The product " + productId + " does not belong to the indicated sale");
+            }
+            returnedProducts.add(product);
+        }
+
+        return returnedProducts;
     }
 }
