@@ -15,7 +15,7 @@ public abstract class Discount {
         this.endDate = endDate;
     }
 
-    //Metodo para validar la vigencia de la promoción(asumiendo rangos inclusivos)
+    //Metod to validate the vigency of the discount
     public boolean isActive(LocalDate date) {
         if (date == null) return false;
         return !date.isBefore(startDate) && !date.isAfter(endDate);
