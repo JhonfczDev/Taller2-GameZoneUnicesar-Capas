@@ -1,9 +1,6 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.BasicWarranty;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Warranty;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.WarrantyRepository;
 
 import java.time.LocalDate;
@@ -28,6 +25,23 @@ public class WarrantyService {
         String priceProduct = String.valueOf(product.getPrice());
 
         BasicWarranty warranty = new BasicWarranty(fabricDefects, duration, priceProduct, generateWarrantyId());
+
+        List<Warranty> warranties = repository.loadAll();
+        warranties.add(warranty);
+        repository.saveAll(warranties);
+
+        return warranty;
+    }
+
+    public ExtendedWarranty assignExtendedWarranty(Product product, Sale sale, LocalDate startDate) {
+        String accidentalDamage = "Covers accidental damage";
+        String fabricDefects = "Covers manufacturing defects";
+        int duration = 12;
+        String priceProduct = String.valueOf(product.getPrice());
+        double additionalCost = 0.10 * product.getPrice();
+
+        ExtendedWarranty warranty = new ExtendedWarranty(
+                accidentalDamage, additionalCost, fabricDefects, duration, priceProduct, generateWarrantyId());
 
         List<Warranty> warranties = repository.loadAll();
         warranties.add(warranty);
