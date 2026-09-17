@@ -19,7 +19,7 @@ public class AccessoryRepository {
         initializeDefaultAccessories();
     }
 
-    public void saveAll(List<Accessory> Accessories){
+    public void saveAll(List<Accessory> accessories){
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Accessory accessory: accessories) {
@@ -32,7 +32,7 @@ public class AccessoryRepository {
                             + controller.getPrice() + ","
                             + controller.getStockQuantity() + ","
                             + controller.getConnectionType() + ","
-                            + joinConsoleIds(memory.getCompatibleConsoleIds());
+                            + joinConsoleIds(controller.getCompatibleConsoleIds());
 
                     writer.write(line);
                     writer.newLine();
