@@ -4,18 +4,21 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.PersonService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.AccessoryService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.PromotionService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Customer;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Accessory;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Controller;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Memory;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Cable;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Promotion;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDate;
 
 /**
  * Class responsible for managing the console-based user interface of the
@@ -41,6 +44,8 @@ public class UI {
     private final ProductService productService;
     
     private final AccessoryService accessoryService;
+    
+    private final PromotionService promotionService;
 
     /**
      * Creates a new instance of the console user interface.
@@ -54,12 +59,14 @@ public class UI {
             SaleService saleService,
             PersonService personService,
             ProductService productService,
-            AccessoryService accessoryService) {
+            AccessoryService accessoryService,
+            PromotionService promotionService) {
         this.scanner = scanner;
         this.saleService = saleService;
         this.personService = personService;
         this.productService = productService;
         this.accessoryService = accessoryService;
+        this.promotionService = promotionService;
     }
 
     /**
@@ -76,6 +83,7 @@ public class UI {
             System.out.println("2. Gestion de personas");
             System.out.println("3. Gestion de ventas");
             System.out.println("4. Gestion de accesorios");
+            System.out.println("5. Gestion de promociones");
             System.out.println("0. Salir de la aplicacion");
             System.out.print("Seleccione una opcion: ");
             String option = scanner.nextLine().trim();
@@ -89,6 +97,8 @@ public class UI {
                     saleMenu();
                 case "4" ->
                     accessoryMenu();
+                case "5" ->
+                    promotionMenu();
                 case "0" -> {
                     exit = true;
                     System.out.println("\n¡Gracias por usar GameZone Unicesar! Saliendo...");
@@ -751,6 +761,146 @@ public class UI {
         System.out.println("Error: " + e.getMessage());
     }
 }
+    
+    public void promotionMenu() {
+        int option = 0;
+        do {
+            System.out.println("\n--- Gestión de Promociones ---");
+            System.out.println("1. Registrar nueva promoción por porcentaje");
+            System.out.println("2. Registrar nueva promoción por categoría");
+            System.out.println("3. Registrar nueva promoción por volumen de compra");
+            System.out.println("4. Listar todas las promociones registradas");
+            System.out.println("5. Listar solo las promociones vigentes");
+            System.out.println("6. Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
+
+            try {
+                option = scanner.nextInt();
+                scanner.nextLine(); // Limpiar el buffer de entrada
+
+                switch (option) {
+                    case 1 ->
+                        registerPercentageDiscountUI();
+                    case 2 ->
+                        registerCategoryDiscountUI();
+                    case 3 ->
+                        registerBulkPurchaseDiscountUI();
+                    case 4 ->
+                        listAllPromotionsUI();
+                    case 5 ->
+                        listActivePromotionsUI();
+                    case 6 ->
+                        System.out.println("Volviendo al menú principal...");
+                    default ->
+                        System.out.println("Opción inválida. Por favor, intente de nuevo.");
+                }
+            } catch (Exception e) {
+                System.out.println("Error: Ingrese un valor numérico válido.");
+                scanner.nextLine();
+                option = 0;
+            }
+        } while (option != 6);
+    }
+
+    private void registerPercentageDiscountUI() {
+        try {
+            System.out.println("\n--- Registrar Promoción por Porcentaje ---");
+            System.out.print("Ingrese ID de la promoción: ");
+            String id = scanner.nextLine();
+            System.out.print("Ingrese nombre de la promoción: ");
+            String name = scanner.nextLine();
+            System.out.print("Ingrese fecha de inicio (AAAA-MM-DD): ");
+            LocalDate startDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese fecha de fin (AAAA-MM-DD): ");
+            LocalDate endDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese el porcentaje de descuento (0 a 100): ");
+            double percentage = scanner.nextDouble();
+            scanner.nextLine();
+
+            promotionService.registerPercentageDiscount(id, name, startDate, endDate, percentage);
+            System.out.println("¡Promoción por porcentaje registrada exitosamente!");
+        } catch (Exception e) {
+            System.out.println("Error al registrar la promoción: " + e.getMessage());
+        }
+    }
+
+    private void registerCategoryDiscountUI() {
+        try {
+            System.out.println("\n--- Registrar Promoción por Categoría ---");
+            System.out.print("Ingrese ID de la promoción: ");
+            String id = scanner.nextLine();
+            System.out.print("Ingrese nombre de la promoción: ");
+            String name = scanner.nextLine();
+            System.out.print("Ingrese fecha de inicio (AAAA-MM-DD): ");
+            LocalDate startDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese fecha de fin (AAAA-MM-DD): ");
+            LocalDate endDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese el porcentaje de descuento (0 a 100): ");
+            double percentage = scanner.nextDouble();
+            scanner.nextLine();
+            System.out.print("Ingrese categoría objetivo (VIDEOGAME / CONSOLE): ");
+            String targetCategory = scanner.nextLine();
+
+            promotionService.registerCategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
+            System.out.println("¡Promoción por categoría registrada exitosamente!");
+        } catch (Exception e) {
+            System.out.println("Error al registrar la promoción: " + e.getMessage());
+        }
+    }
+
+    private void registerBulkPurchaseDiscountUI() {
+        try {
+            System.out.println("\n--- Registrar Promoción por Volumen de Compra ---");
+            System.out.print("Ingrese ID de la promoción: ");
+            String id = scanner.nextLine();
+            System.out.print("Ingrese nombre de la promoción: ");
+            String name = scanner.nextLine();
+            System.out.print("Ingrese fecha de inicio (AAAA-MM-DD): ");
+            LocalDate startDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese fecha de fin (AAAA-MM-DD): ");
+            LocalDate endDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese la cantidad mínima de productos: ");
+            int minQuantity = scanner.nextInt();
+            System.out.print("Ingrese el porcentaje de descuento (0 a 100): ");
+            double percentage = scanner.nextDouble();
+            scanner.nextLine();
+
+            promotionService.registerBulkPurchaseDiscount(id, name, startDate, endDate, minQuantity, percentage);
+            System.out.println("¡Promoción por volumen registrada exitosamente!");
+        } catch (Exception e) {
+            System.out.println("Error al registrar la promoción: " + e.getMessage());
+        }
+    }
+
+    private void listAllPromotionsUI() {
+        System.out.println("\n--- Listado de Todas las Promociones ---");
+        List<Promotion> promotions = promotionService.listAllPromotions();
+        if (promotions.isEmpty()) {
+            System.out.println("No hay promociones registradas en el sistema.");
+        } else {
+            for (Promotion p : promotions) {
+                System.out.println("- ID: " + p.getId() + " | Nombre: " + p.getName() + " | Vigencia: " + p.getStartDate() + " al " + p.getEndDate());
+            }
+        }
+    }
+
+    private void listActivePromotionsUI() {
+        System.out.println("\n--- Listado de Promociones Vigentes ---");
+        List<Promotion> promotions = promotionService.listActivePromotions();
+        if (promotions.isEmpty()) {
+            System.out.println("No hay promociones vigentes en la fecha actual.");
+        } else {
+            for (Promotion p : promotions) {
+                System.out.println("- ID: " + p.getId() + " | Nombre: " + p.getName() + " | Vigencia: " + p.getStartDate() + " al " + p.getEndDate());
+            }
+        }
+    }
+    
+    
+    
+    
+    
+    
 
 
 }
