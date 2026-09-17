@@ -32,7 +32,7 @@ public class AccessoryRepository {
                             + controller.getPrice() + ","
                             + controller.getStockQuantity() + ","
                             + controller.getConnectionType() + ","
-                            + joinConsoleIds(controller.getCompatibleConsoleIds());
+                            + joinConsoleIds(controller.getCompatibleConsoles());
 
                     writer.write(line);
                     writer.newLine();
@@ -61,7 +61,7 @@ public class AccessoryRepository {
                             + memory.getStockQuantity() + ","
                             + memory.getCapacityGB() + ","
                             + memory.getMemoryType() + ","
-                            + joinConsoleIds(memory.getCompatibleConsoleIds());
+                            + joinConsoleIds(memory.getCompatibleConsoles());
 
                     writer.write(line);
                     writer.newLine();
@@ -98,9 +98,10 @@ public class AccessoryRepository {
                             data[2],
                             Double.parseDouble(data[3]),
                             Integer.parseInt(data[4]),
-                            Double.parseDouble(data[5]),
-                            data[6]
+                            data[5]
                     );
+
+                    controller.setCompatibleConsoles(splitConsoleIds(data.length > 6 ? data[6] : ""));
 
                     accessories.add(controller);
 
@@ -125,9 +126,10 @@ public class AccessoryRepository {
                             Double.parseDouble(data[3]),
                             Integer.parseInt(data[4]),
                             Integer.parseInt(data[5]),
-                            data[6],
-                            splitConsoleIds(data.length > 7 ? data[7] : "")
+                            data[6]
                     );
+
+                    memory.setCompatibleConsoles(splitConsoleIds(data.length > 7 ? data[7] : ""));
 
                     accessories.add(memory);
                 }
@@ -194,16 +196,15 @@ public class AccessoryRepository {
 
         List<Accessory> defaultAccessories = new ArrayList<>();
 
-        defaultAccessories.add(
-                new Controller(
-                        "AC001",
-                        "Wireless remote Pro",
-                        180000.0,
-                        15,
-                        "WIRELESS",
-                        new ArrayList<>(List.of("CON001"))
-                )
+        Controller defaultController = new Controller(
+                "AC001",
+                "Wireless remote Pro",
+                180000.0,
+                15,
+                "WIRELESS"
         );
+        defaultController.setCompatibleConsoles(new ArrayList<>(List.of("CON001")));
+        defaultAccessories.add(defaultController);
 
         defaultAccessories.add(
                 new Cable(
@@ -216,17 +217,16 @@ public class AccessoryRepository {
                 )
         );
 
-        defaultAccessories.add(
-                new Memory(
-                        "AC003",
-                        "Card MicroSD 128GB",
-                        95000.0,
-                        20,
-                        128,
-                        "MICRO_SD",
-                        new ArrayList<>(List.of("CON001"))
-                )
+        Memory defaultMemory = new Memory(
+                "AC003",
+                "Card MicroSD 128GB",
+                95000.0,
+                20,
+                128,
+                "MICRO_SD"
         );
+        defaultMemory.setCompatibleConsoles(new ArrayList<>(List.of("CON001")));
+        defaultAccessories.add(defaultMemory);
 
         saveAll(defaultAccessories);
     }
