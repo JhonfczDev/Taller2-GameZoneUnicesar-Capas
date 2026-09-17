@@ -1,6 +1,11 @@
-package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
+package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
+
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PromotionRepository;
 
 import java.time.LocalDate;
+import java.util.*;
+import java.io.*;
 
 public class PromotionService {
 
@@ -11,9 +16,9 @@ public class PromotionService {
     }
 
     public void registerPercentageDiscount(String id, String name, LocalDate startDate,
-                                           LocalDate endDate, double percentage) {
+                                           LocalDate endDate, double percentage) throws FileNotFoundException {
 
-        PercentageDiscount promotion = new PercentageDiscount(id, name, startDate, endDate, percentage);
+        PercentagePromotion promotion = new PercentagePromotion(id, name, startDate, endDate, percentage);
         List<Promotion> promotions = repository.loadAll();
 
         promotions.add(promotion);
@@ -22,9 +27,9 @@ public class PromotionService {
     }
 
     public void registerCategoryDiscount(String id, String name, LocalDate startDate,
-                                         LocalDate endDate, double percentage, String targetCategory) {
+                                         LocalDate endDate, double percentage, String targetCategory) throws FileNotFoundException {
 
-        CategoryDiscount promotion = new CategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
+        CategoryPromotion promotion = new CategoryPromotion(id, name, startDate, endDate, percentage, targetCategory);
         List<Promotion> promotions = repository.loadAll();
 
         promotions.add(promotion);
@@ -33,9 +38,9 @@ public class PromotionService {
     }
 
     public void registerBulkPurchaseDiscount(String id, String name, LocalDate startDate,
-                                             LocalDate endDate, int minQuantity, double percentage) {
+                                             LocalDate endDate, int minQuantity, double percentage) throws FileNotFoundException {
 
-        BulkPurchaseDiscount promotion = new BulkPurchaseDiscount(id, name, startDate, endDate, minQuantity, percentage);
+        BulkPurchasePromotion promotion = new BulkPurchasePromotion(id, name, startDate, endDate, minQuantity, percentage);
         List<Promotion> promotions = repository.loadAll();
 
         promotions.add(promotion);
@@ -43,11 +48,11 @@ public class PromotionService {
         repository.saveAll(promotions);
     }
 
-    public List<Promotion> listAllPromotions() {
+    public List<Promotion> listAllPromotions() throws FileNotFoundException {
         return repository.loadAll();
     }
 
-    public List<Promotion> listActivePromotions() {
+    public List<Promotion> listActivePromotions() throws FileNotFoundException {
         List<Promotion> active = new ArrayList<>();
         LocalDate today = LocalDate.now();
 
@@ -61,7 +66,7 @@ public class PromotionService {
         return active;
     }
 
-    public Promotion findBestPromotionFor(Sale sale) {
+    public Promotion findBestPromotionFor(Sale sale) throws FileNotFoundException {
         Promotion best = null;
         double maxDiscount = 0.0;
 
@@ -76,7 +81,7 @@ public class PromotionService {
         return best;
     }
 
-    public Promotion findById(String id) {
+    public Promotion findById(String id) throws FileNotFoundException {
         for (Promotion promotion: repository.loadAll()) {
             if (promotion.getId().equals(id)) {
                 
