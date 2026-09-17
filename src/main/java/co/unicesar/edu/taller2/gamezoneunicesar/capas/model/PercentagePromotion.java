@@ -2,10 +2,10 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.model;
 
 import java.time.LocalDate;
 
-public class PercentageDiscount extends Discount {
+public class PercentagePromotion extends Promotion {
     private double percentage;
 
-    public PercentageDiscount(String id, String name, LocalDate startDate, LocalDate endDate, double percentage) {
+    public PercentagePromotion(String id, String name, LocalDate startDate, LocalDate endDate, double percentage) {
         super(id, name, startDate, endDate);
         this.percentage = percentage;
     }
