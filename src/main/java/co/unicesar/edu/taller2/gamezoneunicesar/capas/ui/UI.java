@@ -744,7 +744,7 @@ public class UI {
     }
 
     try {
-        List<Accessory> accessories = accessoryService.findAccessoriesCompatibleWith(consoleId);
+        List<Accessory> accessories = accessoryService.getCompatibleAccessories(consoleId);
         if (accessories.isEmpty()) {
             System.out.println("No se encontraron accesorios compatibles con la consola especificada.");
             return;
