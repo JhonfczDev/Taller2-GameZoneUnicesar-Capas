@@ -1,4 +1,6 @@
-package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
+package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
+
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PromotionRepository;
 
 import java.time.LocalDate;
 
