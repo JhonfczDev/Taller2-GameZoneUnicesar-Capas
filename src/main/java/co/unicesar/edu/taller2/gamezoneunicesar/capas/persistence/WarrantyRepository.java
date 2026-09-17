@@ -2,6 +2,7 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.BasicWarranty;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.ExtendedWarranty;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Warranty;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
@@ -52,7 +53,7 @@ public class WarrantyRepository {
                 } else if (warranty instanceof ExtendedWarranty) {
                     type = "EXTENDED";
                 } else {
-                    
+
                     continue;
                 }
 
@@ -70,5 +71,14 @@ public class WarrantyRepository {
 
             throw new RuntimeException("Error saving warranties...", e);
         }
+    }
+
+    private Sale findSaleById(String saleId) {
+        for (Sale sale : saleService.getAllSales()) {
+            if (sale.getId().equals(saleId)) {
+                return sale;
+            }
+        }
+        return null;
     }
 }
