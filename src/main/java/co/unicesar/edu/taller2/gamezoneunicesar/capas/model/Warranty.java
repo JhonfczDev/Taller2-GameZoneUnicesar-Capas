@@ -1,19 +1,28 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.model;
 
+import java.time.LocalDate;
+
 public abstract class Warranty {
-
     private String id;
-    private String fabricDefects;
-    private int duration; // Duration in months
-    private String priceProduct; // Price of the product associated with the warranty
+    private Product product;
+    private Sale sale;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-    public Warranty(String fabricDefects, int duration, String priceProduct, String id) {
-        this.fabricDefects = fabricDefects;
-        this.duration = duration;
-        this.priceProduct = priceProduct;
+    public Warranty(String id, Product product, Sale sale, LocalDate startDate){
         this.id = id;
+        this.product = product;
+        this.sale = sale;
+        this.startDate = startDate;
+        // the endDate is calculated with an abstract method
+        this.endDate = startDate.plusMonths(this.getDurationInMonths());
     }
 
+    // abstract methods
+    public abstract int getDurationInMonths();
+    public abstract String getWarrantyType();
+    public abstract double getAdditionalCost();
+    
     public String getId() {
         return id;
     }
@@ -22,28 +31,66 @@ public abstract class Warranty {
         this.id = id;
     }
 
-    public String getFabricDefects() {
-        return fabricDefects;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setFabricDefects(String fabricDefects) {
-        this.fabricDefects = fabricDefects;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
-    public int getDuration() {
-        return duration;
+    public Sale getSale() {
+        return sale;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
+    public void setSale(Sale sale) {
+        this.sale = sale;
     }
 
-    public String getPriceProduct() {
-        return priceProduct;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setPriceProduct(String priceProduct) {
-        this.priceProduct = priceProduct;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+        // if the start date is modified the end date is recalculated
+        if (startDate != null) {
+            this.endDate = startDate.plusMonths(this.getDurationInMonths());
+        }
     }
 
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    // return true if the indicate date is vigency into the warranty period
+    public boolean isActive(LocalDate date){
+        return !date.isBefore(startDate) && !date.isAfter(endDate);
+    }
+
+    public String generateWarrantyCertificate(){
+        return String.format(
+            "        CERTIFICADO DE GARANTÍA         \n" +
+            "ID Garantía   : %s\n" +
+            "Tipo          : %s\n" +
+            "Producto      : %s\n" +
+            "Venta Asociada: %s\n" +
+            "Fecha Inicio  : %s\n" +
+            "Fecha Fin     : %s\n" +
+            "Costo Adic.   : $%.2f\n",
+            
+            id,
+            getWarrantyType(),
+            product.getTitle(),
+            sale.getId(),
+            startDate.toString(),
+            endDate.toString(),
+            getAdditionalCost()
+        );
+    }
+   
 }
