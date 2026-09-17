@@ -45,7 +45,7 @@ public class AccessoryRepository {
                             + cable.getTitle() + ","
                             + cable.getPrice() + ","
                             + cable.getStockQuantity() + ","
-                            + cable.getLengthInMeters() + ","
+                            + cable.getLengthMeters() + ","
                             + cable.getConnectorType();
 
                     writer.write(line);
@@ -59,7 +59,7 @@ public class AccessoryRepository {
                             + memory.getTitle() + ","
                             + memory.getPrice() + ","
                             + memory.getStockQuantity() + ","
-                            + memory.getCapacityInGigabytes() + ","
+                            + memory.getCapacityGB() + ","
                             + memory.getMemoryType() + ","
                             + joinConsoleIds(memory.getCompatibleConsoleIds());
 
