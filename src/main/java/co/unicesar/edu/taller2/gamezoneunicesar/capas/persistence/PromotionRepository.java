@@ -22,8 +22,8 @@ public class PromotionRepository {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Promotion promotion : promotions) {
 
-                if (promotion instanceof PercentageDiscount) {
-                    PercentageDiscount percentage = (PercentageDiscount) promotion;
+                if (promotion instanceof PercentagePromotion) {
+                    PercentagePromotion percentage = (PercentagePromotion) promotion;
                     String line = "PERCENTAGE,"
                             + percentage.getId() + ","
                             + percentage.getName() + ","
@@ -34,8 +34,8 @@ public class PromotionRepository {
                     writer.write(line);
                     writer.newLine();
 
-                } else if (promotion instanceof CategoryDiscount) {
-                    CategoryDiscount category = (CategoryDiscount) promotion;
+                } else if (promotion instanceof CategoryPromotion) {
+                    CategoryPromotion category = (CategoryPromotion) promotion;
 
                     String line = "CATEGORY,"
                             + category.getId() + ","
@@ -48,15 +48,15 @@ public class PromotionRepository {
                     writer.write(line);
                     writer.newLine();
 
-                } else if (promotion instanceof BulkPurchaseDiscount) {
-                    BulkPurchaseDiscount bulk = (BulkPurchaseDiscount) promotion;
+                } else if (promotion instanceof BulkPurchasePromotion) {
+                    BulkPurchasePromotion bulk = (BulkPurchasePromotion) promotion;
 
-                    String line = "CATEGORY,"
+                    String line = "BULK,"
                             + bulk.getId() + ","
                             + bulk.getName() + ","
                             + bulk.getStartDate() + ","
                             + bulk.getEndDate() + ","
-                            + bulk.getMinQuantity() + ","
+                            + bulk.getMinProducts() + ","
                             + bulk.getPercentage();
 
                     writer.write(line);
@@ -70,7 +70,7 @@ public class PromotionRepository {
         }
     }
 
-    public List<Person> loadAll() throws FileNotFoundException {
+    public List<Promotion> loadAll() throws FileNotFoundException {
 
         List<Promotion> promotions = new ArrayList<>();
 
@@ -90,7 +90,7 @@ public class PromotionRepository {
 
                 if (data[0].equals("PERCENTAGE")) {
 
-                    PercentageDiscount percentage = new PercentageDiscount(
+                    PercentagePromotion percentage = new PercentagePromotion(
                             data[1],
                             data[2],
                             LocalDate.parse(data[3]),
@@ -98,24 +98,25 @@ public class PromotionRepository {
                             Double.parseDouble(data[5])
                     );
 
-                    promotions.add(persentage);
+                    promotions.add(percentage);
 
                 } else if (data[0].equals("CATEGORY")) {
 
-                    CategoryDiscount category = new CategoryDiscount(
+                    CategoryPromotion category = new CategoryPromotion(
                             data[1],
                             data[2],
                             LocalDate.parse(data[3]),
                             LocalDate.parse(data[4]),
-                            Integer.parseInt(data[5]),
-                            Double.parseDouble(data[6])
+                            Double.parseDouble(data[5]),
+                            data[6]
+
                     );
 
                     promotions.add(category);
 
                 } else if (data[0].equals("BULK")) {
 
-                    BulkPurchaseDiscount bulk = new BulkPurchaseDiscount(
+                    BulkPurchasePromotion bulk = new BulkPurchasePromotion(
                             data[1],
                             data[2],
                             LocalDate.parse(data[3]),
