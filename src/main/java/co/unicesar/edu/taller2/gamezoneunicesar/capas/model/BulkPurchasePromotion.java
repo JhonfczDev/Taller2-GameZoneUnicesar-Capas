@@ -2,11 +2,11 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.model;
 
 import java.time.LocalDate;
 
-public class BulkPurchaseDiscount extends Discount {
+public class BulkPurchasePromotion extends Promotion {
     private int minProducts;
     private double percentage;
 
-    public BulkPurchaseDiscount(String id, String name, LocalDate startDate, LocalDate endDate, int minProducts, double percentage) {
+    public BulkPurchasePromotion(String id, String name, LocalDate startDate, LocalDate endDate, int minProducts, double percentage) {
         super(id, name, startDate, endDate);
         this.minProducts = minProducts;
         this.percentage = percentage;
