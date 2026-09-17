@@ -59,4 +59,8 @@ public class WarrantyService {
         }
         return null;
     }
+
+    public List<Warranty> listAllWarranties() {
+        return repository.loadAll();
+    }
 }
