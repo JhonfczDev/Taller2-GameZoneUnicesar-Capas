@@ -1,11 +1,11 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.model;
- 
+
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.temporal.ChronoUnit;
- 
+
 /**
  * Represents a sale made within the GameZone Unicesar system.
  * <p>
@@ -15,31 +15,37 @@ import java.time.temporal.ChronoUnit;
  * </p>
  */
 public class Sale {
- 
+
     /** Unique identifier of the sale. */
     private String id;
- 
+
     /** Date on which the sale was made. */
     private LocalDate date;
- 
+
     /** Customer making the purchase. */
     private Customer customer;
- 
+
     /** Seller handling the sale. */
     private Seller seller;
- 
+
     /** List of products included in the sale. */
     private List<Product> products;
- 
+    
+    /** Name of the promotion applied to the sale, if any. */
+    private String appliedPromotionName;
+    
+    /** Monetary amount discounted from the subtotal. */
+    private double discountAmount;
+
     /**
      * Creates a new {@code Sale} instance with the given data.
      *
-     * @param id       unique identifier of the sale
-     * @param date     date on which the sale is made
-     * @param customer customer associated with the sale
-     * @param seller   seller handling the sale
-     * @param products initial list of products for the sale; if
-     *                 {@code null}, it is initialized as an empty list
+     * @param id        unique identifier of the sale
+     * @param date      date on which the sale is made
+     * @param customer  customer associated with the sale
+     * @param seller    seller handling the sale
+     * @param products  initial list of products for the sale; if
+     *                  {@code null}, it is initialized as an empty list
      */
     public Sale(String id, LocalDate date, Customer customer, Seller seller, List<Product> products) {
         this.id = id;
@@ -48,7 +54,7 @@ public class Sale {
         this.seller = seller;
         this.products = products != null ? new ArrayList<>(products) : new ArrayList<>();
     }
- 
+
     /**
      * Gets the identifier of the sale.
      *
@@ -57,7 +63,7 @@ public class Sale {
     public String getId() {
         return id;
     }
- 
+
     /**
      * Gets the date of the sale.
      *
@@ -66,7 +72,7 @@ public class Sale {
     public LocalDate getDate() {
         return date;
     }
- 
+
     /**
      * Gets the customer associated with the sale.
      *
@@ -75,7 +81,7 @@ public class Sale {
     public Customer getCustomer() {
         return customer;
     }
- 
+
     /**
      * Gets the seller associated with the sale.
      *
@@ -84,7 +90,7 @@ public class Sale {
     public Seller getSeller() {
         return seller;
     }
- 
+
     /**
      * Gets the list of products in the sale.
      * <p>
@@ -97,7 +103,25 @@ public class Sale {
     public List<Product> getProducts() {
         return new ArrayList<>(products);
     }
- 
+
+    /**
+     * Gets the name of the applied promotion.
+     *
+     * @return the applied promotion name
+     */
+    public String getAppliedPromotionName() {
+        return appliedPromotionName;
+    }
+
+    /**
+     * Gets the discount amount applied to the sale.
+     *
+     * @return the discount amount
+     */
+    public double getDiscountAmount() {
+        return discountAmount;
+    }
+
     /**
      * Sets the identifier of the sale.
      *
@@ -106,7 +130,7 @@ public class Sale {
     public void setId(String id) {
         this.id = id;
     }
- 
+
     /**
      * Sets the date of the sale.
      *
@@ -115,7 +139,7 @@ public class Sale {
     public void setDate(LocalDate date) {
         this.date = date;
     }
- 
+
     /**
      * Sets the customer associated with the sale.
      *
@@ -124,7 +148,7 @@ public class Sale {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
- 
+
     /**
      * Sets the seller associated with the sale.
      *
@@ -133,7 +157,7 @@ public class Sale {
     public void setSeller(Seller seller) {
         this.seller = seller;
     }
- 
+
     /**
      * Sets the list of products for the sale.
      * <p>
@@ -146,7 +170,25 @@ public class Sale {
     public void setProducts(List<Product> products) {
         this.products = products != null ? new ArrayList<>(products) : new ArrayList<>();
     }
- 
+
+    /**
+     * Sets the name of the applied promotion.
+     *
+     * @param appliedPromotionName new applied promotion name
+     */
+    public void setAppliedPromotionName(String appliedPromotionName) {
+        this.appliedPromotionName = appliedPromotionName;
+    }
+
+    /**
+     * Sets the discount amount applied to the sale.
+     *
+     * @param discountAmount new discount amount
+     */
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
     /**
      * Calculates the total of the sale by adding up the price of all
      * included products.
@@ -160,7 +202,7 @@ public class Sale {
         }
         return total;
     }
- 
+
     /**
      * Adds a product to the sale.
      * <p>
@@ -174,10 +216,10 @@ public class Sale {
             this.products.add(product);
         }
     }
- 
+
     /**
      * Generates a text representation of the sale, including its
-     * id, date, customer, seller, products, and total.
+     * id, date, customer, seller, products, subtotal, discount, and final total.
      *
      * @return a string with the full detail of the sale
      */
@@ -196,19 +238,30 @@ public class Sale {
                 sb.append("    - ").append(product.getTitle()).append("\n");
             }
         }
-        sb.append("  total: ").append(calculateTotal());
+        double subtotal = calculateTotal();
+        
+        sb.append("  subtotal: $").append(subtotal).append("\n");
+
+        if (appliedPromotionName != null && !appliedPromotionName.isEmpty() && discountAmount > 0) {
+            sb.append("  descuento aplicado [").append(appliedPromotionName).append("]: -$").append(discountAmount).append("\n");
+        } else {
+            sb.append("  descuento aplicado: $0.0\n");
+        }
+
+        double finalTotal = subtotal - discountAmount;
+        
+        sb.append("  total final: $").append(finalTotal);
         return sb.toString();
     }
 
     /**
- * Validates if the sale can accept a return on the given date.
- *
- * @param returnDate The date on which the return is attempted.
- * @return true if the difference is between 0 and 30 calendar days.
- */
-
-    public boolean canBeReturned(LocalDate returnDate){
-        if (returnDate == null || this.date == null){
+     * Validates if the sale can accept a return on the given date.
+     *
+     * @param returnDate The date on which the return is attempted.
+     * @return true if the difference is between 0 and 30 calendar days.
+     */
+    public boolean canBeReturned(LocalDate returnDate) {
+        if (returnDate == null || this.date == null) {
             return false;
         }
         long daysBetween = ChronoUnit.DAYS.between(this.date, returnDate);

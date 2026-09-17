@@ -3,14 +3,22 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.ui;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.PersonService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.AccessoryService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.PromotionService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Customer;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Accessory;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Controller;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Memory;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Cable;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Promotion;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDate;
 
 /**
  * Class responsible for managing the console-based user interface of the
@@ -34,6 +42,10 @@ public class UI {
 
     /** Service responsible for the business logic related to products. */
     private final ProductService productService;
+    
+    private final AccessoryService accessoryService;
+    
+    private final PromotionService promotionService;
 
     /**
      * Creates a new instance of the console user interface.
@@ -46,11 +58,15 @@ public class UI {
     public UI(Scanner scanner,
             SaleService saleService,
             PersonService personService,
-            ProductService productService) {
+            ProductService productService,
+            AccessoryService accessoryService,
+            PromotionService promotionService) {
         this.scanner = scanner;
         this.saleService = saleService;
         this.personService = personService;
         this.productService = productService;
+        this.accessoryService = accessoryService;
+        this.promotionService = promotionService;
     }
 
     /**
@@ -66,6 +82,8 @@ public class UI {
             System.out.println("1. Gestion de productos");
             System.out.println("2. Gestion de personas");
             System.out.println("3. Gestion de ventas");
+            System.out.println("4. Gestion de accesorios");
+            System.out.println("5. Gestion de promociones");
             System.out.println("0. Salir de la aplicacion");
             System.out.print("Seleccione una opcion: ");
             String option = scanner.nextLine().trim();
@@ -77,6 +95,10 @@ public class UI {
                     personMenu();
                 case "3" ->
                     saleMenu();
+                case "4" ->
+                    accessoryMenu();
+                case "5" ->
+                    promotionMenu();
                 case "0" -> {
                     exit = true;
                     System.out.println("\n¡Gracias por usar GameZone Unicesar! Saliendo...");
@@ -505,6 +527,380 @@ public class UI {
             System.out.println("Error: " + e.getMessage());
         }
     }
+    
+    public void accessoryMenu(){
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n========== MENU DE ACCESORIOS ==========");
+            System.out.println("1. Registrar un nuevo control");
+            System.out.println("2. Registrar un nuevo cable");
+            System.out.println("3. Registrar una nueva memoria");
+            System.out.println("4. Listar todos los accesorios");
+            System.out.println("5. Listar accesorios por tipo");
+            System.out.println("6. Consultar accesorios compatibles con una consola");
+            System.out.println("0. Regresar al menu principal");
+            System.out.print("Seleccione una opcion: ");
+            String option = scanner.nextLine().trim();
+
+            switch (option) {
+                case "1" ->
+                    registerController();
+                case "2" ->
+                    registerCable();
+                case "3" ->
+                    registerMemory();
+                case "4" ->
+                    listAllAccessories();
+                case "5" ->
+                    listAccessoriesByType();
+                case "6" ->
+                    listAccessoriesCompatibleWithConsole();
+                case "0" ->
+                    back = true;
+                default ->
+                    System.out.println("Opcion invalida.");
+            }
+        }
+    }
+
+    public void registerController() {
+        System.out.println("\n--- REGISTRAR NUEVO CONTROL ---");
+        System.out.print("ID: ");
+        String id = scanner.nextLine().trim();
+        System.out.print("Título: ");
+        String title = scanner.nextLine().trim();
+        System.out.print("Precio: ");
+        double price = Double.parseDouble(scanner.nextLine().trim());
+        System.out.print("Cantidad en stock: ");
+        int stockQuantity = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Tipo de conexión (ej. Inalámbrico/Alámbrico): ");
+        String connectionType = scanner.nextLine().trim();
+        System.out.print("Ingrese la cantidad de consolas compatibles: ");
+        int n = scanner.nextInt();
+        List<String> compatibleConsoles = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            System.out.print("Ingrese el id de la consola compatible" + (i + 1) + ": ");
+            String console = scanner.nextLine().trim();
+            compatibleConsoles.add(console);
+
+        }
+
+        try {
+            Controller controller = new Controller(id, title, price, stockQuantity, connectionType);
+            accessoryService.registerController(controller);
+            controller.setCompatibleConsoles(compatibleConsoles);
+            System.out.println("\n¡Control registrado con éxito!");
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void registerCable() {
+        System.out.println("\n--- REGISTRAR NUEVO CABLE ---");
+        System.out.print("ID: ");
+        String id = scanner.nextLine().trim();
+        System.out.print("Título: ");
+        String title = scanner.nextLine().trim();
+        System.out.print("Precio: ");
+        double price = Double.parseDouble(scanner.nextLine().trim());
+        System.out.print("Cantidad en stock: ");
+        int stockQuantity = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Longitud en metros (ej. 1.5): ");
+        double length = Double.parseDouble(scanner.nextLine().trim());
+        System.out.print("Tipo de conector (ej. HDMI, USB-C): ");
+        String connectorType = scanner.nextLine().trim();
+
+        try {
+            Cable cable = new Cable(id, title, price, stockQuantity, length, connectorType);
+            accessoryService.registerCable(cable);
+            System.out.println("\n¡Cable registrado con éxito!");
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio, el stock y la longitud.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void registerMemory() {
+        System.out.println("\n--- REGISTRAR NUEVA MEMORIA ---");
+    System.out.print("ID: ");
+    String id = scanner.nextLine().trim();
+    System.out.print("Título: ");
+    String title = scanner.nextLine().trim();
+    System.out.print("Precio: ");
+    double price = Double.parseDouble(scanner.nextLine().trim());
+    System.out.print("Cantidad en stock: ");
+    int stockQuantity = Integer.parseInt(scanner.nextLine().trim());
+    System.out.print("Capacidad en GB (ej. 128): ");
+    int capacity = Integer.parseInt(scanner.nextLine().trim());
+    System.out.print("Tipo de memoria (ej. MicroSD, SD): ");
+    String memoryType = scanner.nextLine().trim();
+    System.out.print("Este producto tiene compatibilidad con consolas? 1-Si, 2-No : ");
+    String text = scanner.nextLine();
+    char opt = text.charAt(0);
+    List<String> compatibleConsoles = new ArrayList<>();
+    
+        if (opt == '1') {
+            System.out.print("Ingrese la cantidad de consolas compatibles: ");
+            int n = Integer.parseInt(scanner.nextLine().trim());
+
+            
+            for (int i = 0; i < n; i++) {
+                System.out.print("Ingrese el id de la consola compatible" + (i + 1) + ": ");
+                String console = scanner.nextLine().trim();
+                compatibleConsoles.add(console);
+
+            }
+
+        }
+        
+        try {
+            Memory memory = new Memory(id, title, price, stockQuantity, capacity, memoryType);
+            if (opt == '1') {
+                memory.setCompatibleConsoles(compatibleConsoles);
+            }
+            accessoryService.registerMemory(memory);
+            if (opt == '1') {
+                
+            }
+        System.out.println("\n¡Memoria registrada con éxito!");
+    } catch (NumberFormatException e) {
+        System.out.println("Error: Por favor, ingrese números válidos para el precio, el stock y la capacidad.");
+    } catch (IllegalArgumentException e) {
+        System.out.println("Error: " + e.getMessage());
+    }
+}
+    
+    public void listAllAccessories() {
+    System.out.println("\n--- INVENTARIO DE ACCESORIOS ---");
+    List<Accessory> accessories = accessoryService.getAllAccessories();
+    if (accessories.isEmpty()) {
+        System.out.println("No hay accesorios registrados en el inventario.");
+        return;
+    }
+    for (Accessory accessory : accessories) {
+        System.out.println(accessory.getId() + " - " + accessory.getTitle()
+                + " | Price: " + accessory.getPrice()
+                + " | Stock: " + accessory.getStockQuantity());
+        System.out.println("---------------------------");
+    }
+}
+    
+    public void listAccessoriesByType() {
+    System.out.println("\n--- LISTAR ACCESORIOS POR TIPO ---");
+    System.out.println("1. Controles");
+    System.out.println("2. Cables");
+    System.out.println("3. Memorias");
+    System.out.print("Seleccione el tipo de accesorio: ");
+    String option = scanner.nextLine().trim();
+
+    String accessoryType = null;
+    switch (option) {
+        case "1":
+            accessoryType = "Controller";
+            break;
+        case "2":
+            accessoryType = "Cable";
+            break;
+        case "3":
+            accessoryType = "Memory";
+            break;
+        default:
+            accessoryType = null;
+            break;
+    }
+
+    if (accessoryType == null) {
+        System.out.println("Opción inválida.");
+        return;
+    }
+
+    List<Accessory> accessories = accessoryService.getAccessoriesByType(accessoryType);
+    if (accessories.isEmpty()) {
+        System.out.println("No hay accesorios registrados para este tipo.");
+        return;
+    }
+
+    System.out.println("\n--- ACCESORIOS DEL TIPO: " + accessoryType + " ---");
+    for (Accessory accessory : accessories) {
+        System.out.println(accessory.getId() + " - " + accessory.getTitle()
+                + " | Price: " + accessory.getPrice()
+                + " | Stock: " + accessory.getStockQuantity());
+        System.out.println("---------------------------");
+    }
+}
+    
+    public void listAccessoriesCompatibleWithConsole() {
+    System.out.println("\n--- ACCESORIOS COMPATIBLES CON CONSOLA ---");
+    System.out.print("Ingrese el ID de la consola: ");
+    String consoleId = scanner.nextLine().trim();
+
+    if (consoleId.isEmpty()) {
+        System.out.println("Error: El ID de la consola no puede estar vacío.");
+        return;
+    }
+
+    try {
+        List<Accessory> accessories = accessoryService.findAccessoriesCompatibleWith(consoleId);
+        if (accessories.isEmpty()) {
+            System.out.println("No se encontraron accesorios compatibles con la consola especificada.");
+            return;
+        }
+
+        System.out.println("\n--- ACCESORIOS COMPATIBLES CON: " + consoleId + " ---");
+        for (Accessory accessory : accessories) {
+            System.out.println(accessory.getId() + " - " + accessory.getTitle()
+                    + " | Price: " + accessory.getPrice()
+                    + " | Stock: " + accessory.getStockQuantity());
+            System.out.println("---------------------------");
+        }
+    } catch (IllegalArgumentException e) {
+        System.out.println("Error: " + e.getMessage());
+    }
+}
+    
+    public void promotionMenu() {
+        int option = 0;
+        do {
+            System.out.println("\n--- Gestión de Promociones ---");
+            System.out.println("1. Registrar nueva promoción por porcentaje");
+            System.out.println("2. Registrar nueva promoción por categoría");
+            System.out.println("3. Registrar nueva promoción por volumen de compra");
+            System.out.println("4. Listar todas las promociones registradas");
+            System.out.println("5. Listar solo las promociones vigentes");
+            System.out.println("6. Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
+
+            try {
+                option = scanner.nextInt();
+                scanner.nextLine(); // Limpiar el buffer de entrada
+
+                switch (option) {
+                    case 1 ->
+                        registerPercentageDiscountUI();
+                    case 2 ->
+                        registerCategoryDiscountUI();
+                    case 3 ->
+                        registerBulkPurchaseDiscountUI();
+                    case 4 ->
+                        listAllPromotionsUI();
+                    case 5 ->
+                        listActivePromotionsUI();
+                    case 6 ->
+                        System.out.println("Volviendo al menú principal...");
+                    default ->
+                        System.out.println("Opción inválida. Por favor, intente de nuevo.");
+                }
+            } catch (Exception e) {
+                System.out.println("Error: Ingrese un valor numérico válido.");
+                scanner.nextLine();
+                option = 0;
+            }
+        } while (option != 6);
+    }
+
+    private void registerPercentageDiscountUI() {
+        try {
+            System.out.println("\n--- Registrar Promoción por Porcentaje ---");
+            System.out.print("Ingrese ID de la promoción: ");
+            String id = scanner.nextLine();
+            System.out.print("Ingrese nombre de la promoción: ");
+            String name = scanner.nextLine();
+            System.out.print("Ingrese fecha de inicio (AAAA-MM-DD): ");
+            LocalDate startDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese fecha de fin (AAAA-MM-DD): ");
+            LocalDate endDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese el porcentaje de descuento (0 a 100): ");
+            double percentage = scanner.nextDouble();
+            scanner.nextLine();
+
+            promotionService.registerPercentageDiscount(id, name, startDate, endDate, percentage);
+            System.out.println("¡Promoción por porcentaje registrada exitosamente!");
+        } catch (Exception e) {
+            System.out.println("Error al registrar la promoción: " + e.getMessage());
+        }
+    }
+
+    private void registerCategoryDiscountUI() {
+        try {
+            System.out.println("\n--- Registrar Promoción por Categoría ---");
+            System.out.print("Ingrese ID de la promoción: ");
+            String id = scanner.nextLine();
+            System.out.print("Ingrese nombre de la promoción: ");
+            String name = scanner.nextLine();
+            System.out.print("Ingrese fecha de inicio (AAAA-MM-DD): ");
+            LocalDate startDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese fecha de fin (AAAA-MM-DD): ");
+            LocalDate endDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese el porcentaje de descuento (0 a 100): ");
+            double percentage = scanner.nextDouble();
+            scanner.nextLine();
+            System.out.print("Ingrese categoría objetivo (VIDEOGAME / CONSOLE): ");
+            String targetCategory = scanner.nextLine();
+
+            promotionService.registerCategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
+            System.out.println("¡Promoción por categoría registrada exitosamente!");
+        } catch (Exception e) {
+            System.out.println("Error al registrar la promoción: " + e.getMessage());
+        }
+    }
+
+    private void registerBulkPurchaseDiscountUI() {
+        try {
+            System.out.println("\n--- Registrar Promoción por Volumen de Compra ---");
+            System.out.print("Ingrese ID de la promoción: ");
+            String id = scanner.nextLine();
+            System.out.print("Ingrese nombre de la promoción: ");
+            String name = scanner.nextLine();
+            System.out.print("Ingrese fecha de inicio (AAAA-MM-DD): ");
+            LocalDate startDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese fecha de fin (AAAA-MM-DD): ");
+            LocalDate endDate = LocalDate.parse(scanner.nextLine());
+            System.out.print("Ingrese la cantidad mínima de productos: ");
+            int minQuantity = scanner.nextInt();
+            System.out.print("Ingrese el porcentaje de descuento (0 a 100): ");
+            double percentage = scanner.nextDouble();
+            scanner.nextLine();
+
+            promotionService.registerBulkPurchaseDiscount(id, name, startDate, endDate, minQuantity, percentage);
+            System.out.println("¡Promoción por volumen registrada exitosamente!");
+        } catch (Exception e) {
+            System.out.println("Error al registrar la promoción: " + e.getMessage());
+        }
+    }
+
+    private void listAllPromotionsUI() {
+        System.out.println("\n--- Listado de Todas las Promociones ---");
+        List<Promotion> promotions = promotionService.listAllPromotions();
+        if (promotions.isEmpty()) {
+            System.out.println("No hay promociones registradas en el sistema.");
+        } else {
+            for (Promotion p : promotions) {
+                System.out.println("- ID: " + p.getId() + " | Nombre: " + p.getName() + " | Vigencia: " + p.getStartDate() + " al " + p.getEndDate());
+            }
+        }
+    }
+
+    private void listActivePromotionsUI() {
+        System.out.println("\n--- Listado de Promociones Vigentes ---");
+        List<Promotion> promotions = promotionService.listActivePromotions();
+        if (promotions.isEmpty()) {
+            System.out.println("No hay promociones vigentes en la fecha actual.");
+        } else {
+            for (Promotion p : promotions) {
+                System.out.println("- ID: " + p.getId() + " | Nombre: " + p.getName() + " | Vigencia: " + p.getStartDate() + " al " + p.getEndDate());
+            }
+        }
+    }
+    
+    
+    
+    
+    
+    
 
 
 }
