@@ -49,4 +49,14 @@ public class WarrantyService {
 
         return warranty;
     }
+
+    public Warranty findWarrantyByProduct(String productId, String saleId) {
+        for (Warranty warranty : repository.loadAll()) {
+            if (warranty.getProduct().getId().equals(productId)
+                    && warranty.getSale().getId().equals(saleId)) {
+                return warranty;
+            }
+        }
+        return null;
+    }
 }
