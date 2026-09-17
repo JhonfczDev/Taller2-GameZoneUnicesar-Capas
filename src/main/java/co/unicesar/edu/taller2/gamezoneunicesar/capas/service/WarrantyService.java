@@ -76,4 +76,20 @@ public class WarrantyService {
 
         return active;
     }
+
+    public List<Warranty> listWarrantiesExpiringSoon(int daysAhead) {
+        List<Warranty> expiringSoon = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        LocalDate limit = today.plusDays(daysAhead);
+
+        for (Warranty warranty : repository.loadAll()) {
+            LocalDate endDate = warranty.getEndDate();
+            // Still covered today, but expiring on or before the limit date
+            if (!endDate.isBefore(today) && !endDate.isAfter(limit)) {
+                expiringSoon.add(warranty);
+            }
+        }
+
+        return expiringSoon;
+    }
 }
