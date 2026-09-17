@@ -7,6 +7,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Accessory;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Promotion;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.SaleRepository;
+import java.io.FileNotFoundException;
  
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -83,7 +84,7 @@ public class SaleService {
      *                                  be found, or if any product
      *                                  has insufficient stock
      */
-    public void registerSale(String customerId, String sellerId, List<String> productIds) {
+    public void registerSale(String customerId, String sellerId, List<String> productIds) throws FileNotFoundException{
         if (productIds == null || productIds.isEmpty()) {
             throw new IllegalArgumentException("Una venta tiene que tener por lo menos un producto.");
         }
