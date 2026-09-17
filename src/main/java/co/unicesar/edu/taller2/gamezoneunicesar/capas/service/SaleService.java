@@ -5,6 +5,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Accessory;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Promotion;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.SaleRepository;
  
 import java.time.LocalDate;
@@ -18,8 +19,9 @@ import java.util.UUID;
  * This service coordinates sale registration and retrieval by
  * delegating persistence to {@link SaleRepository}, product lookups
  * and stock updates to {@link ProductService}, accessory lookups and 
- * updates to {@link AccessoryService}, and customer/seller
- * lookups to {@link PersonService}.
+ * updates to {@link AccessoryService}, customer/seller
+ * lookups to {@link PersonService}, and promotion evaluation
+ * to {@link PromotionService}.
  * </p>
  */
 public class SaleService {
@@ -35,23 +37,29 @@ public class SaleService {
     
     /** Service used to look up and update accessories. */
     private final AccessoryService accessoryService;
- 
+
+    /** Service used to evaluate and calculate applicable promotions. */
+    private final PromotionService promotionService;
+
     /**
      * Creates a new {@code SaleService} with the given dependencies.
      *
-     * @param saleRepository repository used to persist and retrieve sales
-     * @param productService service used to look up and update products
-     * @param personService  service used to look up customers and sellers
+     * @param saleRepository   repository used to persist and retrieve sales
+     * @param productService   service used to look up and update products
+     * @param personService    service used to look up customers and sellers
      * @param accessoryService service used to look up and update accessories
+     * @param promotionService service used to evaluate and calculate promotions
      */
     public SaleService(SaleRepository saleRepository,
                        ProductService productService,
                        PersonService personService,
-                       AccessoryService accessoryService) {
+                       AccessoryService accessoryService,
+                       PromotionService promotionService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.personService = personService;
         this.accessoryService = accessoryService;
+        this.promotionService = promotionService;
     }
  
     /**
@@ -59,9 +67,9 @@ public class SaleService {
      * <p>
      * Validates that at least one product id is provided, that the
      * customer and seller exist, and that every product exists and
-     * has available stock. On success, decreases the stock of each
-     * involved product by one, persists the resulting sale, and
-     * generates a new unique sale id.
+     * has available stock. On success, evaluates any applicable promotions,
+     * decreases the stock of each involved product by one, persists the 
+     * resulting sale, and generates a new unique sale id.
      * </p>
      *
      * @param customerId id of the customer making the purchase
@@ -109,7 +117,16 @@ public class SaleService {
         
         String saleId = generateSaleId();
         Sale sale = new Sale(saleId, LocalDate.now(), customer, seller, products);
-        
+
+        Promotion bestPromotion = promotionService.findBestPromotionFor(sale);
+        if (bestPromotion != null) {
+            double discount = bestPromotion.calculateDiscount(sale);
+            if (discount > 0) {
+                sale.setAppliedPromotionName(bestPromotion.getName());
+                sale.setDiscountAmount(discount);
+            }
+        }
+
         for (Product product : products) {
             product.setStockQuantity(product.getStockQuantity() - 1);
             if (product instanceof Accessory) {
