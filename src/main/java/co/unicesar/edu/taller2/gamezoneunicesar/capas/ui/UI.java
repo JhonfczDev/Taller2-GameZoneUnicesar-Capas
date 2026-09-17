@@ -520,94 +520,102 @@ public class UI {
     
     public void accessoryMenu(){
         boolean back = false;
-    while (!back) {
-        System.out.println("\n========== MENU DE ACCESORIOS ==========");
-        System.out.println("1. Registrar un nuevo control");
-        System.out.println("2. Registrar un nuevo cable");
-        System.out.println("3. Registrar una nueva memoria");
-        System.out.println("4. Listar todos los accesorios");
-        System.out.println("5. Listar accesorios por tipo");
-        System.out.println("6. Consultar accesorios compatibles con una consola");
-        System.out.println("0. Regresar al menu principal");
-        System.out.print("Seleccione una opcion: ");
-        String option = scanner.nextLine().trim();
+        while (!back) {
+            System.out.println("\n========== MENU DE ACCESORIOS ==========");
+            System.out.println("1. Registrar un nuevo control");
+            System.out.println("2. Registrar un nuevo cable");
+            System.out.println("3. Registrar una nueva memoria");
+            System.out.println("4. Listar todos los accesorios");
+            System.out.println("5. Listar accesorios por tipo");
+            System.out.println("6. Consultar accesorios compatibles con una consola");
+            System.out.println("0. Regresar al menu principal");
+            System.out.print("Seleccione una opcion: ");
+            String option = scanner.nextLine().trim();
 
-        switch (option) {
-            case "1" -> registerController();
-            case "2" -> registerCable();
-            case "3" -> registerMemory();
-            case "4" -> listAllAccessories();
-            case "5" -> listAccessoriesByType();
-            case "6" -> listAccessoriesCompatibleWithConsole();
-            case "0" -> back = true;
-            default -> System.out.println("Opcion invalida.");
+            switch (option) {
+                case "1" ->
+                    registerController();
+                case "2" ->
+                    registerCable();
+                case "3" ->
+                    registerMemory();
+                case "4" ->
+                    listAllAccessories();
+                case "5" ->
+                    listAccessoriesByType();
+                case "6" ->
+                    listAccessoriesCompatibleWithConsole();
+                case "0" ->
+                    back = true;
+                default ->
+                    System.out.println("Opcion invalida.");
+            }
         }
     }
-    }
-    
+
     public void registerController() {
-    System.out.println("\n--- REGISTRAR NUEVO CONTROL ---");
-    System.out.print("ID: ");
-    String id = scanner.nextLine().trim();
-    System.out.print("Título: ");
-    String title = scanner.nextLine().trim();
-    System.out.print("Precio: ");
-    double price = Double.parseDouble(scanner.nextLine().trim());
-    System.out.print("Cantidad en stock: ");
-    int stockQuantity = Integer.parseInt(scanner.nextLine().trim());
-    System.out.print("Tipo de conexión (ej. Inalámbrico/Alámbrico): ");
-    String connectionType = scanner.nextLine().trim();
-    System.out.print("Ingrese la cantidad de consolas compatibles: ");
-    int n = scanner.nextInt();
-    
-    List<String> compatibleConsoles = new ArrayList<>();
-    for(int i=0; i<n; i++){
-        System.out.print("Ingrese el id de la consola compatible"+(i+1)+": ");
-        String console = scanner.nextLine().trim();
-        compatibleConsoles.add(console);
-        
+        System.out.println("\n--- REGISTRAR NUEVO CONTROL ---");
+        System.out.print("ID: ");
+        String id = scanner.nextLine().trim();
+        System.out.print("Título: ");
+        String title = scanner.nextLine().trim();
+        System.out.print("Precio: ");
+        double price = Double.parseDouble(scanner.nextLine().trim());
+        System.out.print("Cantidad en stock: ");
+        int stockQuantity = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Tipo de conexión (ej. Inalámbrico/Alámbrico): ");
+        String connectionType = scanner.nextLine().trim();
+        System.out.print("Ingrese la cantidad de consolas compatibles: ");
+        int n = scanner.nextInt();
+        List<String> compatibleConsoles = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            System.out.print("Ingrese el id de la consola compatible" + (i + 1) + ": ");
+            String console = scanner.nextLine().trim();
+            compatibleConsoles.add(console);
+
+        }
+
+        try {
+            Controller controller = new Controller(id, title, price, stockQuantity, connectionType);
+            accessoryService.registerController(controller);
+            controller.setCompatibleConsoles(compatibleConsoles);
+            System.out.println("\n¡Control registrado con éxito!");
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
-    try {
-        Controller controller = new Controller(id, title, price, stockQuantity, connectionType);
-        accessoryService.registerController(controller);
-        controller.setCompatibleConsoles(compatibleConsoles);
-        System.out.println("\n¡Control registrado con éxito!");
-    } catch (NumberFormatException e) {
-        System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
-    } catch (IllegalArgumentException e) {
-        System.out.println("Error: " + e.getMessage());
-    }
-    }
-    
     public void registerCable() {
-    System.out.println("\n--- REGISTRAR NUEVO CABLE ---");
-    System.out.print("ID: ");
-    String id = scanner.nextLine().trim();
-    System.out.print("Título: ");
-    String title = scanner.nextLine().trim();
-    System.out.print("Precio: ");
-    double price = Double.parseDouble(scanner.nextLine().trim());
-    System.out.print("Cantidad en stock: ");
-    int stockQuantity = Integer.parseInt(scanner.nextLine().trim());
-    System.out.print("Longitud en metros (ej. 1.5): ");
-    double length = Double.parseDouble(scanner.nextLine().trim());
-    System.out.print("Tipo de conector (ej. HDMI, USB-C): ");
-    String connectorType = scanner.nextLine().trim();
+        System.out.println("\n--- REGISTRAR NUEVO CABLE ---");
+        System.out.print("ID: ");
+        String id = scanner.nextLine().trim();
+        System.out.print("Título: ");
+        String title = scanner.nextLine().trim();
+        System.out.print("Precio: ");
+        double price = Double.parseDouble(scanner.nextLine().trim());
+        System.out.print("Cantidad en stock: ");
+        int stockQuantity = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Longitud en metros (ej. 1.5): ");
+        double length = Double.parseDouble(scanner.nextLine().trim());
+        System.out.print("Tipo de conector (ej. HDMI, USB-C): ");
+        String connectorType = scanner.nextLine().trim();
 
-    try {
-        Cable cable = new Cable(id, title, price, stockQuantity, length, connectorType);
-        accessoryService.registerCable(cable);
-        System.out.println("\n¡Cable registrado con éxito!");
-    } catch (NumberFormatException e) {
-        System.out.println("Error: Por favor, ingrese números válidos para el precio, el stock y la longitud.");
-    } catch (IllegalArgumentException e) {
-        System.out.println("Error: " + e.getMessage());
+        try {
+            Cable cable = new Cable(id, title, price, stockQuantity, length, connectorType);
+            accessoryService.registerCable(cable);
+            System.out.println("\n¡Cable registrado con éxito!");
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio, el stock y la longitud.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
-}
-    
+
     public void registerMemory() {
-    System.out.println("\n--- REGISTRAR NUEVA MEMORIA ---");
+        System.out.println("\n--- REGISTRAR NUEVA MEMORIA ---");
     System.out.print("ID: ");
     String id = scanner.nextLine().trim();
     System.out.print("Título: ");
@@ -623,12 +631,13 @@ public class UI {
     System.out.print("Este producto tiene compatibilidad con consolas? 1-Si, 2-No : ");
     String text = scanner.nextLine();
     char opt = text.charAt(0);
+    List<String> compatibleConsoles = new ArrayList<>();
     
         if (opt == '1') {
             System.out.print("Ingrese la cantidad de consolas compatibles: ");
-            int n = scanner.nextInt();
+            int n = Integer.parseInt(scanner.nextLine().trim());
 
-            List<String> compatibleConsoles = new ArrayList<>();
+            
             for (int i = 0; i < n; i++) {
                 System.out.print("Ingrese el id de la consola compatible" + (i + 1) + ": ");
                 String console = scanner.nextLine().trim();
