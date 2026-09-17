@@ -1,6 +1,10 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.AccessoryRepository;
+
+import java.util.*;
+import java.io.*;
 
 public class AccessoryService {
 
@@ -49,7 +53,19 @@ public class AccessoryService {
         List<Accessory> result = new ArrayList<>();
 
         for (Accessory accessory : repository.loadAll()) {
-            if (accessory.getAccessoryType().equalsIgnoreCase(accessoryType)) {
+            String type;
+
+            if (accessory instanceof Controller) {
+                type = "CONTROLLER";
+            } else if (accessory instanceof Cable) {
+                type = "CABLE";
+            } else if (accessory instanceof Memory) {
+                type = "MEMORY";
+            } else {
+                continue;
+            }
+
+            if (type.equalsIgnoreCase(accessoryType)) {
                 result.add(accessory);
             }
         }
@@ -63,12 +79,12 @@ public class AccessoryService {
         for (Accessory accessory : repository.loadAll()) {
             if (accessory instanceof Controller) {
                 Controller controller = (Controller) accessory;
-                if (controller.getCompatibleConsoleIds().contains(consoleId)) {
+                if (controller.getCompatibleConsoles().contains(consoleId)) {
                     result.add(controller);
                 }
             } else if (accessory instanceof Memory) {
                 Memory memory = (Memory) accessory;
-                if (memory.getCompatibleConsoleIds().contains(consoleId)) {
+                if (memory.getCompatibleConsoles().contains(consoleId)) {
                     result.add(memory);
                 }
             }
