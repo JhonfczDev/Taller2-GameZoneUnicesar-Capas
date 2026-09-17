@@ -63,4 +63,17 @@ public class WarrantyService {
     public List<Warranty> listAllWarranties() {
         return repository.loadAll();
     }
+
+    public List<Warranty> listActiveWarranties() {
+        List<Warranty> active = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (Warranty warranty : repository.loadAll()) {
+            if (warranty.isActive(today)) {
+                active.add(warranty);
+            }
+        }
+
+        return active;
+    }
 }
