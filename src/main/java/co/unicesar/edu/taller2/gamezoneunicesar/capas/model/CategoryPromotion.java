@@ -2,11 +2,11 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.model;
 
 import java.time.LocalDate;
 
-public class CategoryDiscount extends Discount {
+public class CategoryPromotion extends Promotion {
     private double percentage;
     private String targetCategory;
 
-    public CategoryDiscount(String id, String name, LocalDate startDate, LocalDate endDate, double percentage, String targetCategory) {
+    public CategoryPromotion(String id, String name, LocalDate startDate, LocalDate endDate, double percentage, String targetCategory) {
         super(id, name, startDate, endDate);
         this.percentage = percentage;
         this.targetCategory = targetCategory;

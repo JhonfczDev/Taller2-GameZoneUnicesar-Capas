@@ -2,13 +2,13 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.model;
 
 import java.time.LocalDate;
 
-public abstract class Discount {
+public abstract class Promotion {
     private String id;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public Discount(String id, String name, LocalDate startDate, LocalDate endDate) {
+    public Promotion(String id, String name, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
