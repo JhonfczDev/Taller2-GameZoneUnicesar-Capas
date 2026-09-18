@@ -93,30 +93,17 @@ public class WarrantyRepository {
                 Product product = productService.findById(data[2]);
                 Sale sale = findSaleById(data[3]);
                 LocalDate startDate = LocalDate.parse(data[4]);
-                int duration = Integer.parseInt(data[5]);
-                String fabricDefects = data[6];
-                String priceProduct = String.valueOf(product != null ? product.getPrice() : 0);
 
                 if (product == null || sale == null) continue;
 
                 if (type.equals("BASIC")) {
-                    BasicWarranty basic = new BasicWarranty(fabricDefects, duration, priceProduct, id);
-                    basic.setProduct(product);
-                    basic.setSale(sale);
-
-                    basic.setStartDate(startDate);
+                    BasicWarranty basic = new BasicWarranty(id, product, sale, startDate);
 
                     warranties.add(basic);
 
                 } else if (type.equals("EXTENDED")) {
-                    String accidentalDamage = data[7];
-                    double additionalCost = Double.parseDouble(data[8]);
+                    ExtendedWarranty extended = new ExtendedWarranty(id, product, sale, startDate);
 
-                    ExtendedWarranty extended = new ExtendedWarranty(
-                            accidentalDamage, additionalCost, fabricDefects, duration, priceProduct, id);
-                    extended.setProduct(product);
-                    extended.setSale(sale);
-                    extended.setStartDate(startDate);
 
                     warranties.add(extended);
                 }
