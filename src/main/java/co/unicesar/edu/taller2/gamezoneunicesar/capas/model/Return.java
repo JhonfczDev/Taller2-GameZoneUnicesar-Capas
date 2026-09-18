@@ -37,7 +37,7 @@ public class Return {
         this.sale = sale;
         this.returnedProducts = new ArrayList<>(returnedProducts);
         this.reason = reason;
-        this.refundAmount = calculateRefundAmount;
+        this.refundAmount = calculateRefundAmount();
     }
 
     public double calculateRefundAmount(){
