@@ -28,6 +28,17 @@ public class ProductService {
         products.add(vg);
         repository.saveAll(products);
     }
+    
+    public void restoreStock(String productId, int quantity) {
+        Product product = findById(productId);
+        if (product != null) {
+            int currentStock = product.getStockQuantity();
+            product.setStockQuantity(currentStock + quantity);
+            update(product); // Esto persiste el cambio en el archivo de productos
+        } else {
+            throw new IllegalArgumentException("Product with ID " + productId + " not found for stock restoration.");
+        }
+    }
 
     public List<Product> getAllProducts(){
         return repository.loadAll();
