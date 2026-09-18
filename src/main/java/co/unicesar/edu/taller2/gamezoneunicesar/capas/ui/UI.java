@@ -959,7 +959,7 @@ public class UI {
         String reason = scanner.nextLine().trim();
 
         try {
-            var newReturn = returnService.registerReturn(saleId, productIds, reason);
+            Return newReturn = returnService.registerReturn(saleId, productIds, reason);
             System.out.println("\n¡Devolución registrada con éxito!");
             System.out.println(newReturn.generateReturnReceipt());
         } catch (IllegalArgumentException e) {
@@ -972,7 +972,7 @@ public class UI {
      */
     public void listAllReturns() {
         System.out.println("\n--- TODAS LAS DEVOLUCIONES REGISTRADAS ---");
-        var returns = returnService.viewAllReturns();
+        List<Return> returns = returnService.viewAllReturns();
         if (returns.isEmpty()) {
             System.out.println("No hay devoluciones registradas en el sistema.");
             return;
@@ -992,7 +992,7 @@ public class UI {
         String customerId = scanner.nextLine().trim();
 
         try {
-            var returns = returnService.viewReturnsByCustomer(customerId);
+            List<Return> returns = returnService.viewReturnsByCustomer(customerId);
             if (returns.isEmpty()) {
                 System.out.println("No se encontraron devoluciones para el cliente especificado.");
                 return;
@@ -1015,7 +1015,7 @@ public class UI {
         String saleId = scanner.nextLine().trim();
 
         try {
-            var returns = returnService.viewReturnsBySale(saleId);
+            List<Return> returns = returnService.viewReturnsBySale(saleId);
             if (returns.isEmpty()) {
                 System.out.println("No se encontraron devoluciones para la venta especificada.");
                 return;
