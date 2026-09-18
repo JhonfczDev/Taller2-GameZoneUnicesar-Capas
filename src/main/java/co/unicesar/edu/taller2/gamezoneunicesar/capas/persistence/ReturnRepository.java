@@ -14,8 +14,12 @@ import java.util.List;
 public class ReturnRepository {
 
     private File file;
+    private SaleService saleService;
+    private ProductService productService;
 
-    public ReturnRepository() {this("data/returns.csv");}
+    public ReturnRepository() {
+        this("data/returns.csv");
+    }
 
     public ReturnRepository(String filepath) {
         this.file = new File(filepath);
@@ -120,4 +124,24 @@ public class ReturnRepository {
 
         return returns;
     }
+    
+     private Sale findSaleInService(String saleId) {
+        if (saleService == null || saleService.getAllSales() == null) return null;
+        for (Sale sale : saleService.getAllSales()) {
+            if (sale.getId().equals(saleId)) {
+                return sale;
+            }
+        }
+        return null;
+    }
+
+    public void setSaleService(SaleService saleService) {
+        this.saleService = saleService;
+    }
+
+    public void setProductService(ProductService productService) {
+        this.productService = productService;
+    }
+     
+     
 }

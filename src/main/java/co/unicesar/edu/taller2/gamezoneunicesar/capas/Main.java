@@ -1,11 +1,7 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas;
 
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PersonRepository;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ProductRepository;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.SaleRepository;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.PersonService;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.*;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.*;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.ui.UI;
 
 import java.util.Scanner;
@@ -42,13 +38,33 @@ public class Main {
         PersonRepository personRepository = new PersonRepository();
         ProductRepository productRepository = new ProductRepository();
         SaleRepository saleRepository = new SaleRepository();
+        AccessoryRepository accessoryRepository = new AccessoryRepository();
+        PromotionRepository promotionRepository = new PromotionRepository();
+        ReturnRepository returnRepository = new ReturnRepository();
+        
+        
+        
+        
         
         PersonService personService = new PersonService(personRepository);
         ProductService productService = new ProductService(productRepository);
-        SaleService saleService = new SaleService(saleRepository, productService, personService);
+        AccessoryService accessoryService = new AccessoryService(accessoryRepository);
+        PromotionService promotionService = new PromotionService(promotionRepository);
+        
+        WarrantyRepository warrantyRepository = new WarrantyRepository(productService);
+        WarrantyService warrantyService = new WarrantyService(warrantyRepository);
+        
+        
+        SaleService saleService = new SaleService(saleRepository, productService, personService, accessoryService, promotionService, warrantyService);
+        ReturnService returnService = new ReturnService(returnRepository, saleService, productService);
         Scanner scanner = new Scanner(System.in);
         
-        UI consoleUI = new UI(scanner, saleService, personService, productService );
+        warrantyRepository.setSaleService(saleService);
+        
+        returnRepository.setSaleService(saleService);      
+        returnRepository.setProductService(productService);
+        
+        UI consoleUI = new UI(scanner, saleService, personService, productService, accessoryService, promotionService, returnService, warrantyService );
         
         consoleUI.launch();
     }
