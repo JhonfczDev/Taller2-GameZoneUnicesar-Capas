@@ -48,7 +48,16 @@ public class ProductService {
         return repository.findById(id);
     }
 
-    public void update(Product product){
+    public static void update(Product product){
         repository.update(product);
+    }
+
+    public static void restoreStock(String productId, int quantity) {
+        Product product = findById(productId);
+
+        if (product != null) {
+            product.setStockQuantity(product.getStockQuantity() + quantity);
+            update(product);
+        }
     }
 }
