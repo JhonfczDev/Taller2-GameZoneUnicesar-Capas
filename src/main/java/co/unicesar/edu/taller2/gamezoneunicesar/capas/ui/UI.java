@@ -449,6 +449,8 @@ public class UI {
             System.out.println("\n¡Nueva venta registrada exitosamente!");
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
+        }catch (java.io.FileNotFoundException e) {
+            System.out.println("Error: No se encontró el archivo de datos para guardar la venta. " + e.getMessage());
         }
     }
     
