@@ -1,30 +1,26 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.model;
 
+import java.time.LocalDate;
+
 public class ExtendedWarranty extends Warranty {
 
-    private String accidentalDamage;
-    private double additionalCost; // Additional cost for the extended warranty
-
-    public ExtendedWarranty(String accidentalDamage, double additionalCost, String fabricDefects, int duration, String priceProduct, String id) {
-        super(fabricDefects, duration, priceProduct, id);
-        this.accidentalDamage = accidentalDamage;
-        this.additionalCost = additionalCost;
+    public ExtendedWarranty(String id, Product product, Sale sale, LocalDate startDate) {
+        super(id, product, sale, startDate);
     }
 
-    public String getAccidentalDamage() {
-        return accidentalDamage;
+    @Override
+    public int getDurationInMonths(){
+        return 12;
     }
 
-    public void setAccidentalDamage(String accidentalDamage) {
-        this.accidentalDamage = accidentalDamage;
+    @Override
+    public String getWarrantyType(){
+        return "Garantia Extendida";
     }
 
-    public double getAdditionalCost() {
-        return additionalCost;
+    @Override
+    public double getAdditionalCost(){
+        // calculate the 10% using getPrice from the abstract class Product
+        return this.getProduct().getPrice() * 0.10;
     }
-
-    public void setAdditionalCost(double additionalCost) {
-        this.additionalCost = 0.10 * Double.parseDouble(getPriceProduct());
-    }
-
 }
