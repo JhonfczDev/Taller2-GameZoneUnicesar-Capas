@@ -20,11 +20,7 @@ public class WarrantyService {
     }
 
     public BasicWarranty assignBasicWarranty(Product product, Sale sale, LocalDate startDate) {
-        String fabricDefects = "Covers manufacturing defects";
-        int duration = 12;
-        String priceProduct = String.valueOf(product.getPrice());
-
-        BasicWarranty warranty = new BasicWarranty(fabricDefects, duration, priceProduct, generateWarrantyId());
+        BasicWarranty warranty = new BasicWarranty(generateWarrantyId(), product, sale, startDate);
 
         List<Warranty> warranties = repository.loadAll();
         warranties.add(warranty);
@@ -34,14 +30,7 @@ public class WarrantyService {
     }
 
     public ExtendedWarranty assignExtendedWarranty(Product product, Sale sale, LocalDate startDate) {
-        String accidentalDamage = "Covers accidental damage";
-        String fabricDefects = "Covers manufacturing defects";
-        int duration = 12;
-        String priceProduct = String.valueOf(product.getPrice());
-        double additionalCost = 0.10 * product.getPrice();
-
-        ExtendedWarranty warranty = new ExtendedWarranty(
-                accidentalDamage, additionalCost, fabricDefects, duration, priceProduct, generateWarrantyId());
+        ExtendedWarranty warranty = new ExtendedWarranty(generateWarrantyId(), product, sale, startDate);
 
         List<Warranty> warranties = repository.loadAll();
         warranties.add(warranty);
