@@ -296,6 +296,23 @@ public class SaleService {
  
         return new Sale(id, date, customer, seller, products);
     }
+
+
+    public static Sale findById(String saleId) {
+        for (String line : saleRepository.findAllLines()) {
+            if (line.isBlank()) {
+                continue;
+            }
+
+            String[] fields = line.split("\\|", -1);
+
+            if (fields.length > 0 && fields[0].equals(saleId)) {
+                return buildSaleFromLine(line);
+            }
+        }
+
+        return null;
+    }
  
     /**
      * Generates a new unique identifier for a sale.
