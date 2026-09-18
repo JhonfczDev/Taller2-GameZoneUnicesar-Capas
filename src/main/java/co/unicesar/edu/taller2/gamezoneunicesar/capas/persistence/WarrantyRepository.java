@@ -13,9 +13,9 @@ public class WarrantyRepository {
     private File file;
     private SaleService saleService;
     private ProductService productService;
-
-    public WarrantyRepository(SaleService saleService, ProductService productService) {
-        this("data/warranties.csv", saleService, productService);
+    
+    public WarrantyRepository(ProductService productService) {
+        this("data/warranties.csv", null, productService);
     }
 
     public WarrantyRepository(String fileName, SaleService saleService, ProductService productService) {
@@ -123,4 +123,11 @@ public class WarrantyRepository {
         }
         return null;
     }
+
+    public void setSaleService(SaleService saleService) {
+        this.saleService = saleService;
+    }
+    
+    
+    
 }
