@@ -53,7 +53,7 @@ public class ReturnRepository {
 
                 String line = returnItem.getId() + ","
                         + returnItem.getReturnDate() + ","
-                        + returnItem.getOriginalSale().getId() + ","
+                        + returnItem.getSale().getId() + ","
                         + productIds + ","
                         + returnItem.getReason() + ","
                         + returnItem.getRefundAmount();
