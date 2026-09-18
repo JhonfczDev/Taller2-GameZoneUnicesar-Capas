@@ -5,6 +5,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.AccessoryService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.PromotionService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ReturnService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Customer;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Accessory;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Controller;
@@ -46,6 +47,8 @@ public class UI {
     private final AccessoryService accessoryService;
     
     private final PromotionService promotionService;
+    
+    private final ReturnService returnService;
 
     /**
      * Creates a new instance of the console user interface.
@@ -60,13 +63,15 @@ public class UI {
             PersonService personService,
             ProductService productService,
             AccessoryService accessoryService,
-            PromotionService promotionService) {
+            PromotionService promotionService,
+            ReturnService returnService) {
         this.scanner = scanner;
         this.saleService = saleService;
         this.personService = personService;
         this.productService = productService;
         this.accessoryService = accessoryService;
         this.promotionService = promotionService;
+        this.returnService = returnService;
     }
 
     /**
@@ -84,6 +89,7 @@ public class UI {
             System.out.println("3. Gestion de ventas");
             System.out.println("4. Gestion de accesorios");
             System.out.println("5. Gestion de promociones");
+            System.out.println("6. Gestion de devoluciones");
             System.out.println("0. Salir de la aplicacion");
             System.out.print("Seleccione una opcion: ");
             String option = scanner.nextLine().trim();
@@ -99,6 +105,8 @@ public class UI {
                     accessoryMenu();
                 case "5" ->
                     promotionMenu();
+                case "6" ->
+                    returnMenu();
                 case "0" -> {
                     exit = true;
                     System.out.println("\n¡Gracias por usar GameZone Unicesar! Saliendo...");
