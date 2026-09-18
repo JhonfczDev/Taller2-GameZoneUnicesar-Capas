@@ -85,7 +85,7 @@ public class ReturnService {
         for (Sale sale : SaleService.getAllSales()) {
             LocalDate saleDate = sale.getDate();
             if (saleDate.getMonthValue() == month && saleDate.getYear() == year) {
-                totalSales += sale.getTotal();
+                totalSales += sale.calculateTotal();
             }
         }
 
