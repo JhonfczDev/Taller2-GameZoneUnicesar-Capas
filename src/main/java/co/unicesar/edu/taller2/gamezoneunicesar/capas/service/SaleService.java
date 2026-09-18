@@ -7,8 +7,8 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Accessory;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Promotion;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.SaleRepository;
+
 import java.io.FileNotFoundException;
- 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +28,16 @@ import java.util.UUID;
 public class SaleService {
  
     /** Repository used to persist and retrieve raw sale data. */
-    private final SaleRepository saleRepository;
+    private static SaleRepository saleRepository = null;
  
     /** Service used to look up and update products. */
-    private final ProductService productService;
+    private static ProductService productService = null;
  
     /** Service used to look up customers and sellers. */
-    private final PersonService personService;
+    private static PersonService personService = null;
     
     /** Service used to look up and update accessories. */
-    private final AccessoryService accessoryService;
+    private static AccessoryService accessoryService = null;
 
     /** Service used to evaluate and calculate applicable promotions. */
     private final PromotionService promotionService;
@@ -62,7 +62,7 @@ public class SaleService {
         this.accessoryService = accessoryService;
         this.promotionService = promotionService;
     }
- 
+
     /**
      * Registers a new sale for the given customer, seller, and products.
      * <p>
@@ -231,7 +231,7 @@ public class SaleService {
      * @return the reconstructed sale, or {@code null} if the line
      *         could not be parsed
      */
-    private Sale buildSaleFromLine(String line) {
+    private static Sale buildSaleFromLine(String line) {
         try {
             String[] fields = line.split(";", -1);
  
@@ -272,8 +272,8 @@ public class SaleService {
      * @return the built sale, or {@code null} if the customer or
      *         seller could not be resolved
      */
-    private Sale buildSale(String id, LocalDate date, String customerId,
-                           String sellerId, List<String> productIds) {
+    private static Sale buildSale(String id, LocalDate date, String customerId,
+                                  String sellerId, List<String> productIds) {
  
         Customer customer = personService.findCustomerById(customerId);
         Seller seller = personService.findSellerById(sellerId);
@@ -295,6 +295,23 @@ public class SaleService {
         }
  
         return new Sale(id, date, customer, seller, products);
+    }
+
+
+    public static Sale findById(String saleId) {
+        for (String line : saleRepository.findAllLines()) {
+            if (line.isBlank()) {
+                continue;
+            }
+
+            String[] fields = line.split("\\|", -1);
+
+            if (fields.length > 0 && fields[0].equals(saleId)) {
+                return buildSaleFromLine(line);
+            }
+        }
+
+        return null;
     }
  
     /**
