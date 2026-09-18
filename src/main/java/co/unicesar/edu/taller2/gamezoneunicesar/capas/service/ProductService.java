@@ -9,7 +9,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Console;
 import java.util.List;
 
 public class ProductService {
-    private ProductRepository repository;
+    private static ProductRepository repository;
 
     public ProductService(ProductRepository repository) {
         this.repository = repository;
@@ -33,7 +33,7 @@ public class ProductService {
         return repository.loadAll();
     }
 
-    public Product findById(String id){
+    public static Product findById(String id){
         return repository.findById(id);
     }
 
