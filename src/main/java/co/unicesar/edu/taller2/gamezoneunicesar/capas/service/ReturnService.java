@@ -1,4 +1,5 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Return;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
@@ -27,7 +28,7 @@ public class ReturnService {
             throw new IllegalArgumentException("No sale was found with the id: " + saleId);
         }
 
-        if (!originalSale.canBeReturned()) {
+        if (!originalSale.canBeReturned(LocalDate.now())) {
             throw new IllegalArgumentException("The 30-day period to return this sale has already expired");
         }
 
@@ -59,7 +60,7 @@ public class ReturnService {
         List<Return> result = new ArrayList<>();
 
         for (Return returnItem : repository.loadAll()) {
-            if (returnItem.getOriginalSale().getCustomer().getId().equals(customerId)) {
+            if (returnItem.getSale().getCustomer().getId().equals(customerId)) {
                 result.add(returnItem);
             }
         }
@@ -71,7 +72,7 @@ public class ReturnService {
         List<Return> result = new ArrayList<>();
 
         for (Return returnItem : repository.loadAll()) {
-            if (returnItem.getOriginalSale().getId().equals(saleId)) {
+            if (returnItem.getSale().getId().equals(saleId)) {
                 result.add(returnItem);
             }
         }
@@ -81,7 +82,7 @@ public class ReturnService {
 
     public double generateMonthlyBalance(int month, int year) {
         double totalSales = 0.0;
-        for (Sale sale : saleService.getAllSales()) {
+        for (Sale sale : SaleService.getAllSales()) {
             LocalDate saleDate = sale.getDate();
             if (saleDate.getMonthValue() == month && saleDate.getYear() == year) {
                 totalSales += sale.getTotal();

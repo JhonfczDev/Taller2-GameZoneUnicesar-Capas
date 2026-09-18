@@ -29,12 +29,12 @@ public class ProductService {
         repository.saveAll(products);
     }
     
-    public void restoreStock(String productId, int quantity) {
+    public static void restoreStock(String productId, int quantity) {
         Product product = findById(productId);
         if (product != null) {
             int currentStock = product.getStockQuantity();
             product.setStockQuantity(currentStock + quantity);
-            update(product); // Esto persiste el cambio en el archivo de productos
+            update(product);
         } else {
             throw new IllegalArgumentException("Product with ID " + productId + " not found for stock restoration.");
         }
@@ -48,7 +48,7 @@ public class ProductService {
         return repository.findById(id);
     }
 
-    public void update(Product product){
+    public static void update(Product product){
         repository.update(product);
     }
 }
