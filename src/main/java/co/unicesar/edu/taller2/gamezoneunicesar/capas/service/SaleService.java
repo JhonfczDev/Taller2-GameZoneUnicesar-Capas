@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.io.FileNotFoundException;
  
 /**
  * Provides the business logic for managing {@link Sale} records.
@@ -83,7 +84,7 @@ public class SaleService {
      *                                  be found, or if any product
      *                                  has insufficient stock
      */
-    public void registerSale(String customerId, String sellerId, List<String> productIds) {
+    public void registerSale(String customerId, String sellerId, List<String> productIds) throws FileNotFoundException {
         if (productIds == null || productIds.isEmpty()) {
             throw new IllegalArgumentException("Una venta tiene que tener por lo menos un producto.");
         }
