@@ -11,10 +11,12 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Accessory;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Controller;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Memory;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Cable;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Return;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Promotion;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
+import java.io.FileNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -752,7 +754,7 @@ public class UI {
     }
 
     try {
-        List<Accessory> accessories = accessoryService.findAccessoriesCompatibleWith(consoleId);
+        List<Accessory> accessories = accessoryService.getCompatibleAccessories(consoleId);
         if (accessories.isEmpty()) {
             System.out.println("No se encontraron accesorios compatibles con la consola especificada.");
             return;
@@ -880,7 +882,7 @@ public class UI {
         }
     }
 
-    private void listAllPromotionsUI() {
+    private void listAllPromotionsUI() throws FileNotFoundException {
         System.out.println("\n--- Listado de Todas las Promociones ---");
         List<Promotion> promotions = promotionService.listAllPromotions();
         if (promotions.isEmpty()) {
@@ -892,7 +894,7 @@ public class UI {
         }
     }
 
-    private void listActivePromotionsUI() {
+    private void listActivePromotionsUI() throws FileNotFoundException {
         System.out.println("\n--- Listado de Promociones Vigentes ---");
         List<Promotion> promotions = promotionService.listActivePromotions();
         if (promotions.isEmpty()) {
