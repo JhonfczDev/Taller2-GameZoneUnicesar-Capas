@@ -3,6 +3,7 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Customer;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Console;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Accessory;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Promotion;
@@ -41,6 +42,8 @@ public class SaleService {
 
     /** Service used to evaluate and calculate applicable promotions. */
     private final PromotionService promotionService;
+    
+    private final WarrantyService warrantyService;
 
     /**
      * Creates a new {@code SaleService} with the given dependencies.
@@ -55,12 +58,14 @@ public class SaleService {
                        ProductService productService,
                        PersonService personService,
                        AccessoryService accessoryService,
-                       PromotionService promotionService) {
+                       PromotionService promotionService,
+                       WarrantyService warrantyService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.personService = personService;
         this.accessoryService = accessoryService;
         this.promotionService = promotionService;
+        this.warrantyService = warrantyService;
     }
 
     /**
@@ -84,7 +89,7 @@ public class SaleService {
      *                                  be found, or if any product
      *                                  has insufficient stock
      */
-    public void registerSale(String customerId, String sellerId, List<String> productIds) throws FileNotFoundException {
+    public void registerSale(String customerId, String sellerId, List<String> productIds, List<String> productIdsWithExtendedWarranty) throws FileNotFoundException {
         if (productIds == null || productIds.isEmpty()) {
             throw new IllegalArgumentException("Una venta tiene que tener por lo menos un producto.");
         }
@@ -125,6 +130,16 @@ public class SaleService {
             if (discount > 0) {
                 sale.setAppliedPromotionName(bestPromotion.getName());
                 sale.setDiscountAmount(discount);
+            }
+        }
+        
+        for (Product product : products) {
+            if (product instanceof Console) {
+                warrantyService.assignBasicWarranty(product, sale, sale.getDate());
+            }
+            
+            if (productIdsWithExtendedWarranty != null && productIdsWithExtendedWarranty.contains(product.getId())) {
+                warrantyService.assignExtendedWarranty(product, sale, sale.getDate());
             }
         }
 
