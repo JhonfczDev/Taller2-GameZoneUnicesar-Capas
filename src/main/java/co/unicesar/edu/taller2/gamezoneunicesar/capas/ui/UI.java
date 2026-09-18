@@ -904,6 +904,152 @@ public class UI {
         }
     }
     
+    public void returnMenu() {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n========== GESTION DE DEVOLUCIONES Y BALANCE ==========");
+            System.out.println("1. Registrar una nueva devolucion");
+            System.out.println("2. Consultar todas las devoluciones registradas");
+            System.out.println("3. Consultar devoluciones por cliente");
+            System.out.println("4. Consultar devoluciones por venta");
+            System.out.println("5. Consultar el balance mensual");
+            System.out.println("0. Regresar al menu principal");
+            System.out.print("Seleccione una opcion: ");
+            String option = scanner.nextLine().trim();
+
+            switch (option) {
+                case "1" -> registerReturn();
+                case "2" -> listAllReturns();
+                case "3" -> listReturnsByCustomer();
+                case "4" -> listReturnsBySale();
+                case "5" -> consultMonthlyBalance();
+                case "0" -> back = true;
+                default -> System.out.println("Opcion invalida.");
+            }
+        }
+    }
+
+    /**
+     * Guides the user through the process of registering a product return.
+     */
+    public void registerReturn() {
+        System.out.println("\n--- REGISTRAR NUEVA DEVOLUCION ---");
+        System.out.print("Ingrese el ID de la venta original: ");
+        String saleId = scanner.nextLine().trim();
+
+        System.out.print("Ingrese los IDs de los productos a devolver separados por coma (ejemplo: P001,P002): ");
+        String productsInput = scanner.nextLine().trim();
+
+        List<String> productIds = new ArrayList<>();
+        if (!productsInput.isBlank()) {
+            String[] parts = productsInput.split(",");
+            for (String part : parts) {
+                String id = part.trim();
+                if (!id.isEmpty()) {
+                    productIds.add(id);
+                }
+            }
+        }
+
+        System.out.print("Indique el motivo de la devolucion: ");
+        String reason = scanner.nextLine().trim();
+
+        try {
+            var newReturn = returnService.registerReturn(saleId, productIds, reason);
+            System.out.println("\n¡Devolución registrada con éxito!");
+            System.out.println(newReturn.generateReturnReceipt());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Retrieves and displays all registered returns.
+     */
+    public void listAllReturns() {
+        System.out.println("\n--- TODAS LAS DEVOLUCIONES REGISTRADAS ---");
+        var returns = returnService.viewAllReturns();
+        if (returns.isEmpty()) {
+            System.out.println("No hay devoluciones registradas en el sistema.");
+            return;
+        }
+        for (var ret : returns) {
+            System.out.println(ret.generateReturnReceipt());
+            System.out.println("--------------------------------------------------");
+        }
+    }
+
+    /**
+     * Filters and displays returns associated with a specific customer.
+     */
+    public void listReturnsByCustomer() {
+        System.out.println("\n--- CONSULTAR DEVOLUCIONES POR CLIENTE ---");
+        System.out.print("Ingrese el ID del cliente: ");
+        String customerId = scanner.nextLine().trim();
+
+        try {
+            var returns = returnService.viewReturnsByCustomer(customerId);
+            if (returns.isEmpty()) {
+                System.out.println("No se encontraron devoluciones para el cliente especificado.");
+                return;
+            }
+            for (var ret : returns) {
+                System.out.println(ret.generateReturnReceipt());
+                System.out.println("--------------------------------------------------");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Filters and displays returns associated with a specific sale.
+     */
+    public void listReturnsBySale() {
+        System.out.println("\n--- CONSULTAR DEVOLUCIONES POR VENTA ---");
+        System.out.print("Ingrese el ID de la venta: ");
+        String saleId = scanner.nextLine().trim();
+
+        try {
+            var returns = returnService.viewReturnsBySale(saleId);
+            if (returns.isEmpty()) {
+                System.out.println("No se encontraron devoluciones para la venta especificada.");
+                return;
+            }
+            for (var ret : returns) {
+                System.out.println(ret.generateReturnReceipt());
+                System.out.println("--------------------------------------------------");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Prompts the user for a month and year to calculate and display the net monthly balance.
+     */
+    public void consultMonthlyBalance() {
+        System.out.println("\n--- CONSULTAR BALANCE MENSUAL ---");
+        try {
+            System.out.print("Ingrese el número del mes (1-12): ");
+            int month = Integer.parseInt(scanner.nextLine().trim());
+
+            System.out.print("Ingrese el año (ejemplo: 2026): ");
+            int year = Integer.parseInt(scanner.nextLine().trim());
+
+            double balance = returnService.generateMonthlyBalance(month, year);
+            System.out.println("\n========================================");
+            System.out.println(" Reporte Financiero para " + month + "/" + year);
+            System.out.println(" Balance Neto (Ventas - Devoluciones): $" + balance);
+            System.out.println("========================================");
+
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese valores numéricos válidos para el mes y el año.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+    
     
     
     
