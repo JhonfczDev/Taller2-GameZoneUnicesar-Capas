@@ -47,13 +47,13 @@ public class Return {
 
         if (returnedProducts != null){
             for (Product product : returnedProducts){
-                double ListPrice = product.getPrice();
+                double listPrice = product.getPrice();
                 double proportionalDiscount = 0.0;
 
                 if (saleSubtotal > 0 && saleDiscount > 0){
-                    proportionalDiscount = ListPrice * (saleDiscount / saleSubtotal);
+                    proportionalDiscount = listPrice * (saleDiscount / saleSubtotal);
                 }
-                double itemReund = ListPrice - proportionalDiscount;
+                double itemRefund = listPrice - proportionalDiscount;
                 total += product.getPrice();
             }
         }
@@ -63,6 +63,8 @@ public class Return {
 
     public String generateReturnReceipt(){
         StringBuilder receipt = new StringBuilder();
+        double saleSubtotal = sale.calculateTotal();
+        double saleDiscount = sale.getDiscountAmount();
 
         receipt.append("        COMPROBANTE DE DEVOLUCIÓN        \n");
         receipt.append("ID Devolución    : ").append(id).append("\n");
@@ -72,7 +74,15 @@ public class Return {
         receipt.append("Productos Devueltos:\n");
 
         for (Product p : returnedProducts){
-            receipt.append(String.format(" - %-25s $ %.2f \n", p.getTitle(), p.getPrice()));
+            double listPrice = p.getPrice();
+            double proportionalDiscount = 0.0;
+
+            if (saleSubtotal > 0 && saleDiscount > 0){
+                proportionalDiscount = listPrice * (saleDiscount / saleSubtotal);
+            }
+            double refunded = listPrice - proportionalDiscount;
+
+            receipt.append(String.format(" - %-25s Precio: $%.2f | Desc: -$%.2f | Reembolso: $%.2f \n", p.getTitle(), listPrice, proportionalDiscount, refunded));
         }
 
         receipt.append(String.format("Monto Reembolsado Total: $%.2f\n", refundAmount));
