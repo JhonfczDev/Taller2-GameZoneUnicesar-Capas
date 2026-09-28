@@ -42,9 +42,18 @@ public class Return {
 
     public double calculateRefundAmount(){
         double total = 0.0;
+        double saleSubtotal = sale.calculateTotal();
+        double saleDiscount = sale.getDiscountAmount();
 
         if (returnedProducts != null){
             for (Product product : returnedProducts){
+                double ListPrice = product.getPrice();
+                double proportionalDiscount = 0.0;
+
+                if (saleSubtotal > 0 && saleDiscount > 0){
+                    proportionalDiscount = ListPrice * (saleDiscount / saleSubtotal);
+                }
+                double itemReund = ListPrice - proportionalDiscount;
                 total += product.getPrice();
             }
         }
