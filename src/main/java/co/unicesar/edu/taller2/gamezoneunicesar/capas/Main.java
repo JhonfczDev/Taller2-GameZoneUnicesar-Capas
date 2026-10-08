@@ -24,10 +24,10 @@ public class Main {
      *       {@link SaleRepository}), responsible for data persistence.</li>
      *   <li>Services ({@link PersonService}, {@link ProductService},
      *       {@link SaleService}), responsible for the business logic.</li>
-     *   <li>The console user interface ({@link ConsoleUI}), which receives
+     *   <li>The console user interface ({@link UI}), which receives
      *       the services and a {@link Scanner} to interact with the user.</li>
      * </ol>
-     * Finally, it invokes {@link ConsoleUI#launch()} to start the
+     * Finally, it invokes {@link UI#launch()} to start the
      * execution of the application.
      *
      * @param args command-line arguments (not used)
