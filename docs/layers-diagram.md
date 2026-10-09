@@ -1,22 +1,31 @@
+```mermaid
 flowchart TB
 
     subgraph UI["UI Layer (ui package)"]
         direction TB
-        ConsoleMenu["ConsoleMenu"]
+        UIClass["UI"]
     end
 
     subgraph SERVICE["Service Layer (service package)"]
         direction TB
+        AccessoryService["AccessoryService"]
         PersonService["PersonService"]
         ProductService["ProductService"]
+        PromotionService["PromotionService"]
+        ReturnService["ReturnService"]
         SaleService["SaleService"]
+        WarrantyService["WarrantyService"]
     end
 
     subgraph PERSISTENCE["Persistence Layer (persistence package)"]
         direction TB
+        AccessoryRepository["AccessoryRepository"]
         PersonRepository["PersonRepository"]
         ProductRepository["ProductRepository"]
+        PromotionRepository["PromotionRepository"]
+        ReturnRepository["ReturnRepository"]
         SaleRepository["SaleRepository"]
+        WarrantyRepository["WarrantyRepository"]
     end
 
     subgraph MODEL["Model Layer (model package)"]
@@ -27,7 +36,20 @@ flowchart TB
         Product["Product «abstract»"]
         VideoGame["VideoGame"]
         Console["Console"]
+        Accessory["Accessory «abstract»"]
+        Controller["Controller"]
+        Cable["Cable"]
+        Memory["Memory"]
+        Storage["Storage"]
+        Promotion["Promotion «abstract»"]
+        PercentagePromotion["PercentagePromotion"]
+        CategoryPromotion["CategoryPromotion"]
+        BulkPurchasePromotion["BulkPurchasePromotion"]
+        Warranty["Warranty «abstract»"]
+        BasicWarranty["BasicWarranty"]
+        ExtendedWarranty["ExtendedWarranty"]
         Sale["Sale"]
+        Return["Return"]
     end
 
     Main["Main (root package)"]
@@ -47,8 +69,9 @@ flowchart TB
     classDef uiClass fill:#b71c1c,stroke:#7f1313,stroke-width:2px,color:#ffffff;
     classDef mainClass fill:#4a148c,stroke:#31095c,stroke-width:2px,color:#ffffff;
 
-    class Person,Customer,Seller,Product,VideoGame,Console,Sale modelClass;
-    class PersonRepository,ProductRepository,SaleRepository persistenceClass;
-    class PersonService,ProductService,SaleService serviceClass;
-    class ConsoleMenu uiClass;
+    class Person,Customer,Seller,Product,VideoGame,Console,Accessory,Controller,Cable,Memory,Storage,Promotion,PercentagePromotion,CategoryPromotion,BulkPurchasePromotion,Warranty,BasicWarranty,ExtendedWarranty,Sale,Return modelClass;
+    class AccessoryRepository,PersonRepository,ProductRepository,PromotionRepository,ReturnRepository,SaleRepository,WarrantyRepository persistenceClass;
+    class AccessoryService,PersonService,ProductService,PromotionService,ReturnService,SaleService,WarrantyService serviceClass;
+    class UIClass,ProofUi uiClass;
     class Main mainClass;
+```
