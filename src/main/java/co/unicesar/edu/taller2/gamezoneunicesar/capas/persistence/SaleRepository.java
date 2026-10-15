@@ -1,5 +1,6 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
- 
+
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.excepcions.PersistenceException;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
  
@@ -8,15 +9,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
- 
+import java.util.*;
+
 /**
  * Handles persistence of {@link Sale} objects to a text file.
  * <p>
  * Sales are stored as delimited lines in a flat file, where each
  * line represents one sale with its id, date, customer id, seller id,
  * and the ids of the products included in it.
+ * </p>
+ * <p>
+ * Every {@link IOException} raised while accessing the file is caught here and
+ * rethrown as a {@link PersistenceException} that includes the file path and the
+ * operation being performed, instead of being only logged to the console.
  * </p>
  */
 public class SaleRepository {
@@ -29,24 +34,28 @@ public class SaleRepository {
  
     /** Separator used between product ids within a sale line. */
     private static final String PRODUCT_SEPARATOR = ",";
- 
+
     /**
      * Creates a new {@code SaleRepository}, ensuring that the
      * underlying storage file and its parent directories exist.
+     *
+     * @throws PersistenceException if the storage file or its directories cannot be created
      */
     public SaleRepository() {
         ensureFileExists();
     }
- 
+
     /**
      * Appends a single sale to the storage file.
      * <p>
      * The sale is converted to its line representation and written
-     * at the end of the file. If an I/O error occurs, it is logged
-     * to the standard error stream and the sale is not persisted.
+     * at the end of the file. If an I/O error occurs, it is rethrown
+     * as a {@link PersistenceException} so the caller knows the sale
+     * was not persisted.
      * </p>
      *
      * @param sale the sale to save
+     * @throws PersistenceException if the file cannot be written
      */
    public void save(Sale sale) {
         try {
@@ -54,20 +63,23 @@ public class SaleRepository {
             Files.writeString(Paths.get(FILE_PATH), line,
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
-            System.err.println("Error saving sale: " + e.getMessage());
+            // The original IOException is kept as the cause to preserve traceability
+            throw new PersistenceException(
+                    "Error writing sale to file '" + FILE_PATH + "' (save operation)", e);
         }
     }
- 
+
     /**
      * Overwrites the storage file with the given list of sales.
      * <p>
      * Each sale in the list is converted to its line representation,
      * and the resulting lines fully replace the current content of
-     * the file. If an I/O error occurs, it is logged to the standard
-     * error stream.
+     * the file. If an I/O error occurs, it is rethrown as a
+     * {@link PersistenceException}.
      * </p>
      *
      * @param sales the list of sales to persist
+     * @throws PersistenceException if the file cannot be written
      */
     public void saveAll(List<Sale> sales) {
         List<String> lines = new ArrayList<>();
@@ -77,21 +89,23 @@ public class SaleRepository {
         try {
             Files.write(Paths.get(FILE_PATH), lines);
         } catch (IOException e) {
-            System.err.println("Error saving all sales: " + e.getMessage());
+            throw new PersistenceException(
+                    "Error writing sales to file '" + FILE_PATH + "' (save all operation)", e);
         }
     }
- 
+
     /**
      * Reads and returns all raw lines currently stored in the sales
      * file.
      * <p>
      * If the file does not exist, an empty list is returned. If an
-     * I/O error occurs while reading, it is logged to the standard
-     * error stream and an empty (or partially filled) list is
-     * returned.
+     * I/O error occurs while reading, it is rethrown as a
+     * {@link PersistenceException} instead of silently returning an
+     * empty list.
      * </p>
      *
      * @return the list of raw lines from the sales file
+     * @throws PersistenceException if the file cannot be read
      */
     public List<String> findAllLines() {
         List<String> lines = new ArrayList<>();
@@ -102,11 +116,12 @@ public class SaleRepository {
             }
             lines = Files.readAllLines(path);
         } catch (IOException e) {
-            System.err.println("Error loading sales: " + e.getMessage());
+            throw new PersistenceException(
+                    "Error reading sales from file '" + FILE_PATH + "' (load operation)", e);
         }
         return lines;
     }
- 
+
     /**
      * Converts a {@link Sale} into its delimited line representation
      * for storage.
@@ -135,14 +150,16 @@ public class SaleRepository {
                 + sale.getSeller().getId() + DELIMITER
                 + productIds;
     }
- 
+
     /**
      * Ensures that the storage file and its parent directories exist,
      * creating them if necessary.
      * <p>
-     * If an I/O error occurs during creation, it is logged to the
-     * standard error stream.
+     * If an I/O error occurs during creation, it is rethrown as a
+     * {@link PersistenceException}.
      * </p>
+     *
+     * @throws PersistenceException if the storage file or its directories cannot be created
      */
     private void ensureFileExists() {
         try {
@@ -154,7 +171,8 @@ public class SaleRepository {
                 Files.createFile(path);
             }
         } catch (IOException e) {
-            System.err.println("Error creating sales file: " + e.getMessage());
+            throw new PersistenceException(
+                    "Error creating sales file '" + FILE_PATH + "' (create operation)", e);
         }
     }
  
