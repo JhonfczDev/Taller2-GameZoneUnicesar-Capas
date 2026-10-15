@@ -1,9 +1,12 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
-import java.io.*;
-import java.util.*;
+
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.excepcions.PersistenceException;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Person;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Customer;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * Class responsible for persisting Person objects (Customer and Seller)
@@ -11,6 +14,11 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Seller;
  * Manages saving (saveAll), loading (loadAll), and searching
  * for persons by ID, and also verifies that the data file exists
  * before using it.
+ * <p>
+ * Every {@link IOException} raised while accessing the file is caught here and
+ * rethrown as a {@link PersistenceException} that includes the file path and the
+ * operation being performed.
+ * </p>
  */
 public class PersonRepository {
     private File file; // Physical file where data is read from / written to
@@ -19,6 +27,8 @@ public class PersonRepository {
      * Default constructor: uses a fixed default path
      * ("data/persons.txt") for the persistence file.
      * Internally delegates to the constructor that receives the path.
+     *
+     * @throws PersistenceException if the data file cannot be created or initialized
      */
     public PersonRepository() {
         this("data/persons.txt");
@@ -26,7 +36,9 @@ public class PersonRepository {
 
     /**
      * Constructor: receives the path of the file used to persist data.
+     *
      * @param filePath path of the text file
+     * @throws PersistenceException if the data file cannot be created or initialized
      */
     public PersonRepository(String filePath) {
         this.file = new File(filePath);
@@ -39,7 +51,9 @@ public class PersonRepository {
      * overwriting its previous content. Each type of person is saved
      * on a line with a different format, identified by the "CUSTOMER"
      * or "SELLER" tag at the beginning.
+     *
      * @param persons list of people to save
+     * @throws PersistenceException if the file cannot be written
      */
     public void saveAll(List<Person> persons){
 
@@ -74,8 +88,9 @@ public class PersonRepository {
             }
 
         } catch (IOException e) {
-            // Rethrown as an unchecked exception to simplify error handling
-            throw new RuntimeException("Error saving persons...", e);
+            // The original IOException is kept as the cause to preserve traceability
+            throw new PersistenceException(
+                    "Error writing persons to file '" + file.getPath() + "' (save operation)", e);
         }
     }
 
@@ -84,7 +99,9 @@ public class PersonRepository {
      * distinguishing between Customer and Seller based on the first column
      * of each line. If the file doesn't exist, returns an empty list instead
      * of failing. Empty lines are skipped.
+     *
      * @return list of people loaded from the file
+     * @throws PersistenceException if the file cannot be read
      */
     public List<Person> loadAll(){
 
@@ -120,8 +137,8 @@ public class PersonRepository {
                 }
             }
         } catch (IOException e) {
-            // Rethrown as an unchecked exception to simplify error handling
-            throw new RuntimeException("Error loading persons...", e);
+            throw new PersistenceException(
+                    "Error reading persons from file '" + file.getPath() + "' (load operation)", e);
         }
 
         return persons;
@@ -130,8 +147,12 @@ public class PersonRepository {
     /**
      * Finds a customer by their id, by iterating over the full list loaded from the file.
      * Note: internally calls loadAll(), so every search re-reads the entire file.
+     * Returns null when the customer does not exist; deciding whether that is an
+     * error is the responsibility of the service/validator layer.
+     *
      * @param id customer's identifier
      * @return the Customer found, or null if it doesn't exist
+     * @throws PersistenceException if the file cannot be read
      */
     public Customer findCustomerById(String id) {
         for (Person person : loadAll()) {
@@ -144,8 +165,11 @@ public class PersonRepository {
 
     /**
      * Finds a seller by their id, by iterating over the full list loaded from the file.
+     * Returns null when the seller does not exist.
+     *
      * @param id seller's identifier
      * @return the Seller found, or null if it doesn't exist
+     * @throws PersistenceException if the file cannot be read
      */
     public Seller findSellerById(String id) {
         for (Person person : loadAll()) {
@@ -160,9 +184,9 @@ public class PersonRepository {
      * Ensures that the data file physically exists on disk.
      * If the parent directory doesn't exist, it is created (including any
      * necessary subdirectories). If the file itself doesn't exist, it is
-     * created empty. Any I/O error during this process is logged to the
-     * console instead of stopping execution, so it doesn't prevent the
-     * repository from being used.
+     * created empty.
+     *
+     * @throws PersistenceException if the directories or the file cannot be created
      */
     private void ensureFileExists() {
         try {
@@ -174,7 +198,8 @@ public class PersonRepository {
                 file.createNewFile(); // Creates an empty file if it doesn't exist
             }
         } catch (IOException e) {
-            System.err.println("Error creating the persons file: " + e.getMessage());
+            throw new PersistenceException(
+                    "Error creating persons file '" + file.getPath() + "' (create operation)", e);
         }
     }
 
@@ -183,6 +208,8 @@ public class PersonRepository {
      * when the file does not exist or is empty.
      * This ensures that the application starts with the minimum
      * required number of preloaded sellers.
+     *
+     * @throws PersistenceException if the default sellers cannot be written
      */
     private void initializeDefaultSellers() {
         if(file.exists() && file.length() > 0) {return;}
