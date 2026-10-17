@@ -143,13 +143,8 @@ public class ProductRepository {
      * @throws PersistenceException if the file cannot be read
      */
     public Product findById(String id) {
-        List<Product> products = loadAll();
-        for (Product product : products) {
-            if (product.getId().equals(id)) {
-                return product;
-            }
-        }
-        return null;
+        return loadAll().stream().filter(product -> product.getId().equals(id))
+                .findFirst().orElse(null);
     }
 
     /**
