@@ -30,6 +30,16 @@ public class ProductService {
         this.repository = repository;
     }
 
+    /** Creates a new auxiliary method to apply the principle DRY(Don't Repeat Yourself)
+     * And it is useful in registerConsole
+     * And it is useful in registerVideoGame
+     */
+    private void saveProduct(Product product){
+        List<Product> products = repository.loadAll();
+        products.add(product);
+        repository.saveAll(products);
+    }
+
     /**
      * Registers a new console after validating its common product data.
      *
@@ -47,9 +57,7 @@ public class ProductService {
      */
     public void registerConsole(String id, String title, double price, int stockquantity, String brand, String model, String generation){
         Console c = new Console(id, title, price, stockquantity, brand, model, generation);
-        List<Product> products = repository.loadAll();
-        products.add(c);
-        repository.saveAll(products);
+        saveProduct(c);
     }
 
     /**
@@ -72,9 +80,7 @@ public class ProductService {
         ProductValidator.validateProductData(id, title, price, stockquantity);
 
         VideoGame vg = new VideoGame(id, title, price, stockquantity, platform, genre, ageRating);
-        List<Product> products = repository.loadAll();
-        products.add(vg);
-        repository.saveAll(products);
+        saveProduct(vg);
     }
 
     /**
