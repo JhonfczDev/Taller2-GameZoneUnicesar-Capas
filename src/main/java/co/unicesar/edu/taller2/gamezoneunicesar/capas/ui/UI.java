@@ -926,8 +926,18 @@ public class UI {
 
             promotionService.registerPercentageDiscount(id, name, startDate, endDate, percentage);
             System.out.println("¡Promoción por porcentaje registrada exitosamente!");
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
+        } catch (ResourceNotFoundExcepcion e) {
+            System.out.println("No se encontró el recurso solicitado: " + e.getMessage());
+        } catch (BussinesRuleException e) {
+            System.out.println("No se puede completar la operación: " + e.getMessage());
+        } catch (InvalidDataException e) {
+            System.out.println("Los datos ingresados no son válidos: " + e.getMessage());
+        } catch (PersistenceException e) {
+            System.out.println("Ocurrió un problema al acceder a los datos del sistema. Contacte al administrador.");
         } catch (Exception e) {
-            System.out.println("Error al registrar la promoción: " + e.getMessage());
+            System.out.println("Ocurrió un error inesperado en el sistema: " + e.getMessage());
         }
     }
 
@@ -950,8 +960,18 @@ public class UI {
 
             promotionService.registerCategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
             System.out.println("¡Promoción por categoría registrada exitosamente!");
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
+        } catch (ResourceNotFoundExcepcion e) {
+            System.out.println("No se encontró el recurso solicitado: " + e.getMessage());
+        } catch (BussinesRuleException e) {
+            System.out.println("No se puede completar la operación: " + e.getMessage());
+        } catch (InvalidDataException e) {
+            System.out.println("Los datos ingresados no son válidos: " + e.getMessage());
+        } catch (PersistenceException e) {
+            System.out.println("Ocurrió un problema al acceder a los datos del sistema. Contacte al administrador.");
         } catch (Exception e) {
-            System.out.println("Error al registrar la promoción: " + e.getMessage());
+            System.out.println("Ocurrió un error inesperado en el sistema: " + e.getMessage());
         }
     }
 
@@ -974,8 +994,18 @@ public class UI {
 
             promotionService.registerBulkPurchaseDiscount(id, name, startDate, endDate, minQuantity, percentage);
             System.out.println("¡Promoción por volumen registrada exitosamente!");
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
+        } catch (ResourceNotFoundExcepcion e) {
+            System.out.println("No se encontró el recurso solicitado: " + e.getMessage());
+        } catch (BussinesRuleException e) {
+            System.out.println("No se puede completar la operación: " + e.getMessage());
+        } catch (InvalidDataException e) {
+            System.out.println("Los datos ingresados no son válidos: " + e.getMessage());
+        } catch (PersistenceException e) {
+            System.out.println("Ocurrió un problema al acceder a los datos del sistema. Contacte al administrador.");
         } catch (Exception e) {
-            System.out.println("Error al registrar la promoción: " + e.getMessage());
+            System.out.println("Ocurrió un error inesperado en el sistema: " + e.getMessage());
         }
     }
 
