@@ -2,6 +2,8 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.ui;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.*;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.excepcions.*;
+
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
