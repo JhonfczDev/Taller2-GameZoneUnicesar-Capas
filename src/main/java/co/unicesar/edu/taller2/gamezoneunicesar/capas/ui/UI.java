@@ -1087,8 +1087,18 @@ public class UI {
             Return newReturn = returnService.registerReturn(saleId, productIds, reason);
             System.out.println("\n¡Devolución registrada con éxito!");
             System.out.println(newReturn.generateReturnReceipt());
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
+        } catch (ResourceNotFoundExcepcion e) {
+            System.out.println("No se encontró el recurso solicitado: " + e.getMessage());
+        } catch (BussinesRuleException e) {
+            System.out.println("No se puede completar la operación: " + e.getMessage());
+        } catch (InvalidDataException e) {
+            System.out.println("Los datos ingresados no son válidos: " + e.getMessage());
+        } catch (PersistenceException e) {
+            System.out.println("Ocurrió un problema al acceder a los datos del sistema. Contacte al administrador.");
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado en el sistema: " + e.getMessage());
         }
     }
 
@@ -1126,8 +1136,18 @@ public class UI {
                 System.out.println(ret.generateReturnReceipt());
                 System.out.println("--------------------------------------------------");
             }
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
+        } catch (ResourceNotFoundExcepcion e) {
+            System.out.println("No se encontró el recurso solicitado: " + e.getMessage());
+        } catch (BussinesRuleException e) {
+            System.out.println("No se puede completar la operación: " + e.getMessage());
+        } catch (InvalidDataException e) {
+            System.out.println("Los datos ingresados no son válidos: " + e.getMessage());
+        } catch (PersistenceException e) {
+            System.out.println("Ocurrió un problema al acceder a los datos del sistema. Contacte al administrador.");
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado en el sistema: " + e.getMessage());
         }
     }
 
@@ -1149,8 +1169,18 @@ public class UI {
                 System.out.println(ret.generateReturnReceipt());
                 System.out.println("--------------------------------------------------");
             }
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
+        } catch (ResourceNotFoundExcepcion e) {
+            System.out.println("No se encontró el recurso solicitado: " + e.getMessage());
+        } catch (BussinesRuleException e) {
+            System.out.println("No se puede completar la operación: " + e.getMessage());
+        } catch (InvalidDataException e) {
+            System.out.println("Los datos ingresados no son válidos: " + e.getMessage());
+        } catch (PersistenceException e) {
+            System.out.println("Ocurrió un problema al acceder a los datos del sistema. Contacte al administrador.");
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado en el sistema: " + e.getMessage());
         }
     }
 
@@ -1173,9 +1203,17 @@ public class UI {
             System.out.println("========================================");
 
         } catch (NumberFormatException e) {
-            System.out.println("Error: Por favor, ingrese valores numéricos válidos para el mes y el año.");
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error: Por favor, ingrese números válidos para el precio y el stock.");
+        } catch (ResourceNotFoundExcepcion e) {
+            System.out.println("No se encontró el recurso solicitado: " + e.getMessage());
+        } catch (BussinesRuleException e) {
+            System.out.println("No se puede completar la operación: " + e.getMessage());
+        } catch (InvalidDataException e) {
+            System.out.println("Los datos ingresados no son válidos: " + e.getMessage());
+        } catch (PersistenceException e) {
+            System.out.println("Ocurrió un problema al acceder a los datos del sistema. Contacte al administrador.");
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado en el sistema: " + e.getMessage());
         }
     }
     
