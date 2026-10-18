@@ -4,7 +4,7 @@
 **Auditor:** Developer 2  
 **Phase:** 1 — Audit
 
-The verdict criteria and the evidence rules are the ones agreed by the team in `docs/grasp-analysis.md`. In this repository the console class is `UI` (package `ui`), so `UI` is used everywhere in this report. Responsibilities follow the assignment table, and `../../TEAM.md` matches it.
+The verdict criteria and the evidence rules are the ones agreed by the team in `docs/grasp-analysis.md`. In this repository the console class is `UI` (package `ui`), so `UI` is used everywhere in this report. Responsibilities follow the assignment table, and `TEAM.md` matches it.
 
 ## 1. Scope
 
@@ -15,6 +15,7 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 | Promotions (Req. 2) | `PromotionRepository`: `saveAll`, `loadAll`, `ensureFileExists`.<br>`PromotionService`: `registerPercentageDiscount`, `registerCategoryDiscount`, `registerBulkPurchaseDiscount`, `listAllPromotions`, `listActivePromotions`, `findBestPromotionFor`, `findById`. |
 | Returns (Req. 3) | `ReturnRepository`: `saveAll`, `loadAll`, `findSaleInService`, `setSaleService`, `setProductService`, `ensureFileExists`.<br>`ReturnService`: `registerReturn`, `viewAllReturns`, `viewReturnsByCustomer`, `viewReturnsBySale`, `generateMonthlyBalance`, and its private helpers. |
 | Warranties (Req. 4) | `WarrantyRepository`: constructors, `saveAll`, `loadAll`, `findSaleById`, `setSaleService`, `ensureFileExists`.<br>`WarrantyService`: `assignBasicWarranty`, `assignExtendedWarranty`, `findWarrantyByProduct`, `listAllWarranties`, `listActiveWarranties`, `listWarrantiesExpiringSoon`. |
+| Exceptions and validations (Req. 6) | Only the Req. 6 modifications made by Developer 2: the conversion of `IOException` into `PersistenceException` in `PersonRepository`, `ProductRepository` and `SaleRepository`; the validator calls in `PersonService`, `ProductService` (`registerConsole`, `registerVideoGame`) and `SaleService` (`registerSale`, `getSalesBySeller`, `getSalesByCustomer`). The rest of those classes belongs to Developer 1 or the Technical Lead and is not audited here. |
 
 ## 2. Verdict summary
 
@@ -31,6 +32,8 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 | Protected Variations | Violation | V-09 (V-01, V-04, V-08, V-13, V-17 related) |
 
 When a finding breaks more than one pattern, it is registered once under its guiding pattern and referenced as "related" under the others.
+
+## 3. Pattern sections
 
 ### 3.1 Information Expert
 **Verdict:** Violation V-12, V-15, V-16, (V-05 related).
@@ -110,7 +113,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | In the persistence package, introduce a small serializer abstraction per person type (it states whether it handles a given person, converts it to a line, and rebuilds it from the fields), with one implementation for `Customer` and one for `Seller`. `PersonRepository` iterates over the available serializers instead of branching. The typed lookups in the repository and in the service are replaced by one generic method parameterized by type. The file format stays identical. |
 | Code from another team member | No |
 
-
 ### V-02
 
 | Field | Content |
@@ -123,7 +125,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | Changing the preloaded sellers requires editing a persistence class. Creating a repository modifies the file, which makes it harder to reuse or test in isolation. |
 | Proposed solution | Move the seed data and its initialization to a dedicated initializer class (Pure Fabrication) that uses the repository through `loadAll` and `saveAll`, and call it at startup. The file content after startup must remain identical. |
 | Code from another team member | Yes: `Main` (Technical Lead), the composition root, would call the initializer. |
-
 
 ### V-03
 
@@ -138,7 +139,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Remove the history from `Customer` (attribute, getter and `addPurchase`) and rely on `SaleService.getSalesByCustomer`. Any class that uses these members is adapted to that service method. |
 | Code from another team member | Only if other classes use `getPurchaseHistory` or `addPurchase`; their owner adapts them. |
 
-
 ### V-04
 
 | Field | Content |
@@ -151,7 +151,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | Adding a new accessory type (for example, a headset) requires editing both methods. If `saveAll` is not updated, accessories of the new type are silently not saved because there is no `else` branch. |
 | Proposed solution | Same design as V-01: one serializer per accessory type behind a common abstraction in the persistence package, with the repository iterating over them. The file format and the `CONTROLLER`/`CABLE`/`MEMORY` tags stay identical. |
 | Code from another team member | No |
-
 
 ### V-05
 
@@ -166,7 +165,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Let `Accessory` answer both questions (an identifier of its type, and whether it is compatible with a console) and make the service iterate over `Accessory` without casts or type strings. The results for the current data must remain identical, and the text printed by `UI` for the type keeps its current content. |
 | Code from another team member | Yes: `Accessory` (Developer 1) provides the type identifier, and `UI` (Technical Lead) adapts its accessory-type menu. Related to boundary candidate B-6 of `grasp-analysis.md`. |
 
-
 ### V-06
 
 | Field | Content |
@@ -179,7 +177,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | Changing the preloaded accessories requires editing a persistence class, and the seed data silently depends on a console `CON001` existing in another file. |
 | Proposed solution | Same approach as V-02: move the seed data to a dedicated initializer (Pure Fabrication), keeping the file content after startup identical. |
 | Code from another team member | Yes: `Main` (Technical Lead), the composition root, would call the initializer. |
-
 
 ### V-07
 
@@ -194,7 +191,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | `AccessoryService.registerController`, `registerCable` and `registerMemory` receive primitives and create the entity, as `ProductService` does. The persisted result must stay identical, including the order in which the compatible consoles are set, which the Technical Lead describes in B-5. |
 | Code from another team member | Yes: `UI` (Technical Lead) removes its `new` calls after the service signatures change. Developer 2 changes the service first. |
 
-
 ### V-08
 
 | Field | Content |
@@ -207,7 +203,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | Adding a new promotion type requires editing both methods. If `saveAll` is not updated, promotions of the new type are silently not saved because there is no `else` branch. |
 | Proposed solution | Same design as V-01 and V-04: one serializer per promotion type behind a common abstraction in the persistence package. The file format and the `PERCENTAGE`/`CATEGORY`/`BULK` tags stay identical. |
 | Code from another team member | No |
-
 
 ### V-09
 
@@ -222,7 +217,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Remove the unnecessary `throws FileNotFoundException` declarations and the `java.io` imports from the service. Behavior does not change because the exception is never thrown. |
 | Code from another team member | Yes: `SaleService.registerSale` and the promotion methods of `UI` (Technical Lead) declare or handle this exception; a `catch` of `FileNotFoundException` that can no longer be thrown would stop compiling and is removed by its owner. |
 
-
 ### V-10
 
 | Field | Content |
@@ -235,7 +229,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | `ReturnRepository` cannot be used without the services being initialized first, because their static state is set in their constructors. Any change to the `SaleService` or `ProductService` API breaks the repository, and a cycle between the service and persistence layers becomes possible. |
 | Proposed solution | The repository must not know the services. Return only the stored data (ids) from the repository and resolve the `Sale` and `Product` references in `ReturnService`, the same shape as `SaleRepository` and `SaleService`. Remove the dead fields, setters and method. The file format stays identical. |
 | Code from another team member | Yes: `Main` (Technical Lead) calls `setSaleService` and `setProductService`, and removes those calls last. Related to boundary candidate B-1 of `grasp-analysis.md` (Developer 2 changes first). |
-
 
 ### V-11
 
@@ -250,7 +243,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Keep the injected `SaleService` and `ProductService` in fields and call them through the instance references. This compiles with the current static methods, so it can be done first, and the Technical Lead removes `static` later without affecting this class. |
 | Code from another team member | No for the first step. The Technical Lead later makes the `SaleService` methods instance methods (boundary candidate B-2 of `grasp-analysis.md`). |
 
-
 ### V-12
 
 | Field | Content |
@@ -263,7 +255,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | If the way a sale references its customer changes, this method breaks, as would every other place that repeats the chain. |
 | Proposed solution | Add a question method to `Return` (for example, whether it belongs to a customer id) and make the service call it. The results stay identical. |
 | Code from another team member | Yes: `Return` belongs to Developer 1. |
-
 
 ### V-13
 
@@ -278,7 +269,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Same design as V-01, V-04 and V-08: one entry per warranty type (tag and way to rebuild it) behind a common abstraction in the persistence package. The file format and the `BASIC`/`EXTENDED` tags stay identical. |
 | Code from another team member | No |
 
-
 ### V-14
 
 | Field | Content |
@@ -291,7 +281,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | The repository is only valid after the setter has been called by the code that wires the application, and any change to the `SaleService` or `ProductService` API breaks it. It also uses a different injection mechanism from `ReturnRepository`. |
 | Proposed solution | Same as V-10: the repository returns only the stored data (ids), and `WarrantyService` resolves the `Product` and `Sale` references. Remove the `null` argument and the setter. The file format stays identical. |
 | Code from another team member | Yes: `Main` (Technical Lead) calls `setSaleService` and removes it last. Related to boundary candidate B-1 of `grasp-analysis.md` (Developer 2 changes first). |
-
 
 ### V-15
 
@@ -306,7 +295,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Use the single existing lookup of `SaleService` (`findById`) in all three places. Once V-10 and V-14 are corrected, the lookup only remains in `ReturnService` and `WarrantyService`. |
 | Code from another team member | No |
 
-
 ### V-16
 
 | Field | Content |
@@ -320,7 +308,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Add two question methods to `Warranty` (one for the expiry window and one for coverage of a product in a sale) and make the service call them. The results stay identical. |
 | Code from another team member | Yes: `Warranty` belongs to Developer 1. |
 
-
 ### V-17
 
 | Field | Content |
@@ -333,7 +320,6 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | Changing the storage would require editing the type of the repository in the five services and the code that wires them, instead of adding one new implementation. |
 | Proposed solution | Define one repository interface per module in the persistence package, implemented by the current file-based repositories, and make the services depend on the interface. Behavior and data files do not change, and `Main` keeps compiling because it passes the concrete repository where the interface is expected. |
 | Code from another team member | No for the Developer 2 classes. `ProductService` (Developer 1) and `SaleService` (Technical Lead) have the same shape and are reported by their owners. |
-
 
 ## 5. Issues reported to the Technical Lead
 
