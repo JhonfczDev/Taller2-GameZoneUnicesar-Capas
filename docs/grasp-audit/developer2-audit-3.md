@@ -12,6 +12,7 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 |---|---|
 | Persons (Workshop 1) | `Person`, `Customer` (including `getPurchaseHistory`, `addPurchase`), `Seller`.<br>`PersonRepository`: `saveAll`, `loadAll`, `findCustomerById`, `findSellerById`, `ensureFileExists`, `initializeDefaultSellers`.<br>`PersonService`: `registerCustomer`, `getAllCustomers`, `getAllSellers`, `findCustomerById`, `findSellerById`. |
 | Accessories (Req. 1) | `AccessoryRepository`: `saveAll`, `loadAll`, `findById`, `joinConsoleIds`, `splitConsoleIds`, `ensureFileExists`, `initializeDefaultAccessories`.<br>`AccessoryService`: `registerController`, `registerCable`, `registerMemory`, `getAllAccessories`, `getAccessoriesByType`, `getCompatibleAccessories`, `findById`, `hasStock`, `update`. |
+| Promotions (Req. 2) | `PromotionRepository`: `saveAll`, `loadAll`, `ensureFileExists`.<br>`PromotionService`: `registerPercentageDiscount`, `registerCategoryDiscount`, `registerBulkPurchaseDiscount`, `listAllPromotions`, `listActivePromotions`, `findBestPromotionFor`, `findById`. |
 
 ## 2. Verdict summary
 
@@ -20,12 +21,12 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 | Information Expert | Violation | (V-05 related) |
 | Creator | Violation | V-07 |
 | Controller | Not applicable | — |
-| Low Coupling | Violation | V-03, (V-08 related) |
+| Low Coupling | Violation | V-03, (V-09, V-10 related) |
 | High Cohesion | Violation | V-02, V-06 |
-| Polymorphism | Violation | V-01, V-04, V-05 |
+| Polymorphism | Violation | V-01, V-04, V-05, V-08 |
 | Pure Fabrication | Correct | — |
-| Indirection | Violation | V-08 |
-| Protected Variations | Violation | (V-01, V-04, V-08 related) |
+| Indirection | Violation | V-10 |
+| Protected Variations | Violation | V-09 (V-01, V-04, V-08, V-10 related) |
 
 When a finding breaks more than one pattern, it is registered once under its guiding pattern and referenced as "related" under the others.
 
@@ -34,16 +35,16 @@ When a finding breaks more than one pattern, it is registered once under its gui
 ### 3.1 Information Expert
 **Verdict:** Violation (V-05 related).
 
-*Correct points.* `Person`, `Customer` and `Seller` own and expose their own data.
+*Correct points.* `Person`, `Customer` and `Seller` own and expose their own data. `PromotionService.findBestPromotionFor` asks each promotion for its own discount (`promotion.calculateDiscount(sale)`), and `PromotionService.listActivePromotions` asks each promotion whether it is active (`isActive(today)`).
 
 *Violations.* `AccessoryService.getCompatibleAccessories` decides on data that belongs to the accessory (V-05).
 
 ### 3.2 Creator
-**Verdict:** Violation V-07.
+**Verdict:** Violation (V-07).
 
-*Correct points.* `PersonService.registerCustomer` creates the object it records from the primitives it receives. `Customer` creates its own `purchaseHistory` because it contains it. `PersonRepository` creates objects in `loadAll` from the file fields, since it holds the initializing data. The creation of the default sellers is legitimate as an act of creation; the concern about where that seeding lives is registered under High Cohesion (V-02).
+*Correct points.* `PersonService.registerCustomer`, `PromotionService.register...Discount` create the objects they record from the primitives they receive. `Customer` creates its own `purchaseHistory` because it contains it. The repositories (`PersonRepository`, `AccessoryRepository`, `PromotionRepository`) create objects in `loadAll` from the file fields, since they hold the initializing data. The creation of the default sellers and accessories is legitimate as an act of creation; the concern about where that seeding lives is registered under High Cohesion (V-02, V-06).
 
-*Violation.* `AccessoryService.registerController`, `registerCable` and `registerMemory` receive already-built entities, so the caller has to create them (V-07).
+*Violations.* `AccessoryService.registerController`, `registerCable` and `registerMemory` receive already-built entities, so the caller has to create them (V-07).
 
 ### 3.3 Controller
 **Verdict:** Not applicable.
@@ -51,40 +52,44 @@ When a finding breaks more than one pattern, it is registered once under its gui
 Classes reviewed: `Person`, `Customer`, `Seller`, `PersonRepository`, `PersonService`, `AccessoryRepository` and `AccessoryService`. None of them receives events from the user interface, and none uses `Scanner` or `System.out`. System events are received by `UI` (Technical Lead), which delegates to the services.
 
 ### 3.4 Low Coupling
-**Verdict:** Violation V-03, (V-08 related).
+**Verdict:** Violation V-03, (V-10 related).
 
-*Correct points.* The services receive their repositories through the constructor and never instantiate them, and the Persons and Accessories repositories depend only on the model.
+*Correct points.* The services receive their repositories through the constructor and never instantiate them, and the Persons, Accessories and Promotions repositories depend only on the model.
 
-*Violations.* The cyclic dependency between `Customer` and `Sale` (V-03). The services are directly bound to concrete file-based repository classes (V-08).
+*Violations.* The cyclic dependency between `Customer` and `Sale` (V-03), and the file-storage exception exposed by the promotion service signatures (V-09). The services are directly bound to concrete file-based repository classes (V-10).
 
 ### 3.5 High Cohesion
 **Verdict:** Violation (V-02, V-06).
 
-`Person`, `Seller`, `PersonService` and `AccessoryService` can each be described in one sentence without "and". The violations are the seed data inside the Persons and Accessories repositories (V-02, V-06).
+`Person`, `Seller`, `PersonService`, `AccessoryService` and `PromotionService` can each be described in one sentence without "and". The violations are the seed data inside the Persons and Accessories repositories (V-02, V-06).
 
 ### 3.6 Polymorphism
-**Verdict:** Violation (V-01, V-04, V-05).
+**Verdict:** Violation (V-01, V-04, V-05, V-08).
 
-*Violations.* The type tests in `PersonRepository` and `PersonService` (V-01), in `AccessoryRepository` (V-04), and in `AccessoryService` (V-05).
+*Correct point.* `PromotionService.findBestPromotionFor` works with the abstract `Promotion` and calls `calculateDiscount` without checking the promotion subclass.
+
+*Violations.* The type tests in `PersonRepository` and `PersonService` (V-01), in `AccessoryRepository` (V-04), in `AccessoryService` (V-05), and in `PromotionRepository` (V-08).
 
 ### 3.7 Pure Fabrication
 **Verdict:** Correct.
 
-File layout, parsing and writing live in dedicated repository classes, so the model classes (`Person`, `Customer`, `Seller` and the others) contain no I/O code. `AccessoryRepository.joinConsoleIds` and `splitConsoleIds` keep the storage format of the compatible-console list inside the persistence layer. Validation lives in `PersonValidator`, called from `PersonService`.
+File layout, parsing and writing live in dedicated repository classes, so the model classes (`Person`, `Customer`, `Seller` and the others) contain no I/O code. `AccessoryRepository.joinConsoleIds` and `splitConsoleIds` keep the storage format of the compatible-console list inside the persistence layer. Validation lives in `PersonValidator`, called from `PersonService`, and `ProductRepository`, `PersonRepository` and `SaleRepository` convert `IOException` into `PersistenceException`.
 
 The preparation of the data file (`ensureFileExists`) is repeated in each repository. It is not registered because it sits in the class that should own it, so it does not break the criterion.
 
 ### 3.8 Indirection
-**Verdict:** Violation (V-08).
+**Verdict:** Violation (V-10).
 
-*Correct points.* Callers obtain people and accessories through their services instead of reading files, and the repositories sit between the services and the files.
+*Correct points.* Callers obtain people, accessories and promotions through their services instead of reading files, and the repositories sit between the services and the files.
 
-*Violations.* `PersonService` and `AccessoryService` are bound directly to their concrete file-based repository classes (V-08).
+*Violations.* `PersonService`, `AccessoryService` and `PromotionService` are bound directly to their concrete file-based repository classes (V-10).
 
 ### 3.9 Protected Variations
-**Verdict:** Violation (V-01, V-04, V-08 related).
+**Verdict:** Violation V-09, (V-01, V-04, V-08, V-10 related).
 
-The unprotected variation points are the addition of new person or accessory types, whose type-dependent conditionals are registered under Polymorphism (V-01, V-04). The direct dependency on concrete repositories is registered under Indirection (V-08).
+The unprotected variation points are the storage mechanism, whose `java.io` exception leaks into the promotion service signatures (V-09), and the addition of new person, accessory or promotion types, whose type-dependent conditionals are registered under Polymorphism (V-01, V-04, V-08). The direct dependency on concrete repositories is registered under Indirection (V-10).
+
+*Correct points.* `PromotionService.findBestPromotionFor` does not change when a new promotion type is added, and the repository constructors that receive a `filePath` allow changing the file location without touching the classes.
 
 ## 4. Violations
 
@@ -184,11 +189,37 @@ The unprotected variation points are the addition of new person or accessory typ
 | Field | Content |
 |---|---|
 | ID | V-08 |
+| Pattern | Polymorphism (guiding pattern); also Protected Variations |
+| Module | Promotions (Req. 2) |
+| Evidence | `PromotionRepository.saveAll`: `if (promotion instanceof PercentagePromotion) { ... } else if (promotion instanceof CategoryPromotion) { ... } else if (promotion instanceof BulkPurchasePromotion) { ... }` (no `else` branch).<br>`PromotionRepository.loadAll`: `if (data[0].equals("PERCENTAGE")) { ... } else if (data[0].equals("CATEGORY")) { ... } else if (data[0].equals("BULK")) { ... }`. |
+| Explanation | The promotion hierarchy is polymorphic for the calculation (`calculateDiscount`), but not for persistence: how each promotion type is written and rebuilt is decided with type tests in the repository. Each branch repeats the common fields (`id`, `name`, `startDate`, `endDate`). |
+| Consequence | Adding a new promotion type requires editing both methods. If `saveAll` is not updated, promotions of the new type are silently not saved because there is no `else` branch. |
+| Proposed solution | Same design as V-01 and V-04: one serializer per promotion type behind a common abstraction in the persistence package. The file format and the `PERCENTAGE`/`CATEGORY`/`BULK` tags stay identical. |
+| Code from another team member | No |
+
+### V-09
+
+| Field | Content |
+|---|---|
+| ID | V-09 |
+| Pattern | Protected Variations (guiding pattern); also Low Coupling |
+| Module | Promotions (Req. 2) |
+| Evidence | `PromotionRepository.loadAll() throws FileNotFoundException`.<br>`PromotionService`: `import java.io.*;` and every public method declares `throws FileNotFoundException` (`registerPercentageDiscount`, `registerCategoryDiscount`, `registerBulkPurchaseDiscount`, `listAllPromotions`, `listActivePromotions`, `findBestPromotionFor`, `findById`).<br>`SaleService.registerSale` also declares `throws FileNotFoundException`. |
+| Explanation | `loadAll` already catches every `IOException` inside its `try/catch` and rethrows a `RuntimeException`, so `FileNotFoundException` is never thrown at runtime. Even so, the declaration exposes a file-storage detail in the service API and forces every caller to declare or handle it. |
+| Consequence | Changing the storage mechanism (for example, to a database, one of the likely changes of this project) would force changes in the service signatures and in every caller, such as `SaleService.registerSale` and the promotion menu of `UI`. |
+| Proposed solution | Remove the unnecessary `throws FileNotFoundException` declarations and the `java.io` imports from the service. Behavior does not change because the exception is never thrown. |
+| Code from another team member | Yes: `SaleService.registerSale` and the promotion methods of `UI` (Technical Lead) declare or handle this exception; a `catch` of `FileNotFoundException` that can no longer be thrown would stop compiling and is removed by its owner. |
+
+### V-10
+
+| Field | Content |
+|---|---|
+| ID | V-10 |
 | Pattern | Indirection (guiding pattern); also Protected Variations and Low Coupling |
-| Module | Persons and Accessories |
-| Evidence | `PersonService(PersonRepository repository)` and `AccessoryService(AccessoryRepository repository)`: each service keeps a field typed with the concrete file-based repository class, and no interface exists for either repository. |
+| Module | Persons, Accessories and Promotions |
+| Evidence | `PersonService(PersonRepository repository)`, `AccessoryService(AccessoryRepository repository)` and `PromotionService(PromotionRepository repository)`: each service keeps a field typed with the concrete file-based repository class, and no interface exists for any of these repositories. |
 | Explanation | The services and their storage are bound directly, and the storage is one of the likely changes of the project (a database instead of files). An interface between them does not exist. |
-| Consequence | Changing the storage would require editing the repository type in both services and the code that wires them, instead of adding one new implementation. |
+| Consequence | Changing the storage would require editing the repository type in the three services and the code that wires them, instead of adding one new implementation. |
 | Proposed solution | Define one repository interface per module in the persistence package, implemented by the current file-based repositories, and make the services depend on the interface. Behavior and data files do not change, and `Main` keeps compiling because it passes the concrete repository where the interface is expected. |
 | Code from another team member | No for the Developer 2 classes. `ProductService` (Developer 1) and `SaleService` (Technical Lead) have the same shape and are reported by their owners. |
 
@@ -197,7 +228,7 @@ The unprotected variation points are the addition of new person or accessory typ
 | Class / method | Owner | Description and evidence |
 |---|---|---|
 | `SaleService.registerSale` and `buildSale` (accessories) | Technical Lead | `Accessory` is a `Product`, but it is stored and queried through a parallel service and repository, so `SaleService` has to branch: `if (product == null) { product = (Product) accessoryService.findById(productId); }` and `if (product instanceof Accessory) { accessoryService.update((Accessory) product); } else { productService.update(product); }`. On the Developer 2 side, `AccessoryService.findById` and `update` mirror the `ProductService` API with a different type. Related to boundary candidate B-4. |
-| `ProductService.registerConsole` | Developer 1 / Technical Lead | The method has no call to `ProductValidator.validateProductData`, while `registerVideoGame` has it. See Section 6. |
+| Answers to open VERIFY items of `grasp-analysis.md` | Technical Lead | **D-5:** `AccessoryService.registerAccessory` saves the full list (`repository.saveAll`) before returning, so any change made to the entity afterwards, such as setting compatible consoles, is not persisted unless `update` is called. |
 
 ## 6. Possible functional defects and items outside scope
 
@@ -205,6 +236,5 @@ These items were found by reading the code. They change what the user or the dat
 
 | Class / method | Evidence | Observed behavior / reason |
 |---|---|---|
-| `PersonRepository` (`saveAll` / `loadAll`) | Fields are joined with `","` and read with `line.split(",")`. The free-text field is `name`. | A value containing a comma shifts the fields when the record is read back. |
-| `AccessoryRepository` (`saveAll` / `loadAll`) | Fields are joined with `","` and read with `line.split(",")`. The free-text field is `title`. | A value containing a comma shifts the fields when the record is read back. |
-| Error handling and console output of Accessories | `AccessoryRepository`: `throw new RuntimeException("Error saving ...", e)`. `AccessoryRepository.ensureFileExists` only prints `System.err`. `AccessoryService`: `throw new IllegalArgumentException(...)` with English messages. | These classes were not covered by the Req. 6 refactor, so their errors do not use the custom exception hierarchy, and the repository writes to the console outside `UI`. Changing the exception types, messages or `System.err` output changes what the program shows or emits, which the team's verification plan treats as behavior to preserve. |
+| `PersonRepository`, `AccessoryRepository`, `PromotionRepository` (`saveAll` / `loadAll`) | Fields are joined with `","` and read with `line.split(",")`. The free-text fields are `name` and `title`. | A value containing a comma shifts the fields when the record is read back. |
+| Error handling and console output of Accessories and Promotions | `AccessoryRepository` and `PromotionRepository`: `throw new RuntimeException("Error saving ...", e)`. `PromotionRepository.ensureFileExists` only prints `System.err`. `AccessoryService` throws `IllegalArgumentException(...)` with English messages. | These classes were not covered by the Req. 6 refactor, so their errors do not use the custom exception hierarchy, and `PromotionRepository` writes to the console outside `UI`. Changing the exception types, the messages or the `System.err` output changes what the program shows or emits, which the team's verification plan treats as behavior to preserve. |
