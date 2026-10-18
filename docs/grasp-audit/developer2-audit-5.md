@@ -14,85 +14,84 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 | Accessories (Req. 1) | `AccessoryRepository`: `saveAll`, `loadAll`, `findById`, `joinConsoleIds`, `splitConsoleIds`, `ensureFileExists`, `initializeDefaultAccessories`.<br>`AccessoryService`: `registerController`, `registerCable`, `registerMemory`, `getAllAccessories`, `getAccessoriesByType`, `getCompatibleAccessories`, `findById`, `hasStock`, `update`. |
 | Promotions (Req. 2) | `PromotionRepository`: `saveAll`, `loadAll`, `ensureFileExists`.<br>`PromotionService`: `registerPercentageDiscount`, `registerCategoryDiscount`, `registerBulkPurchaseDiscount`, `listAllPromotions`, `listActivePromotions`, `findBestPromotionFor`, `findById`. |
 | Returns (Req. 3) | `ReturnRepository`: `saveAll`, `loadAll`, `findSaleInService`, `setSaleService`, `setProductService`, `ensureFileExists`.<br>`ReturnService`: `registerReturn`, `viewAllReturns`, `viewReturnsByCustomer`, `viewReturnsBySale`, `generateMonthlyBalance`, and its private helpers. |
+| Warranties (Req. 4) | `WarrantyRepository`: constructors, `saveAll`, `loadAll`, `findSaleById`, `setSaleService`, `ensureFileExists`.<br>`WarrantyService`: `assignBasicWarranty`, `assignExtendedWarranty`, `findWarrantyByProduct`, `listAllWarranties`, `listActiveWarranties`, `listWarrantiesExpiringSoon`. |
 
 ## 2. Verdict summary
 
 | Pattern | Verdict | Violation IDs |
 |---|---|---|
-| Information Expert | Violation | V-12, V-13, (V-05 related) |
+| Information Expert | Violation | V-12, V-15, V-16 (V-05 related) |
 | Creator | Violation | V-07 |
 | Controller | Not applicable | — |
-| Low Coupling | Violation | V-03, V-10, V-11, (V-09, V-14 related) |
+| Low Coupling | Violation | V-03, V-10, V-11, V-14 (V-09, V-17 related) |
 | High Cohesion | Violation | V-02, V-06 |
-| Polymorphism | Violation | V-01, V-04, V-05, V-08 |
+| Polymorphism | Violation | V-01, V-04, V-05, V-08, V-13 |
 | Pure Fabrication | Correct | — |
-| Indirection | Violation | V-10, V-14 |
-| Protected Variations | Violation | V-09 (V-01, V-04, V-08, V-14 related) |
+| Indirection | Violation | V-17 (V-10, V-14 related) |
+| Protected Variations | Violation | V-09 (V-01, V-04, V-08, V-13, V-17 related) |
 
 When a finding breaks more than one pattern, it is registered once under its guiding pattern and referenced as "related" under the others.
 
-## 3. Pattern sections
-
 ### 3.1 Information Expert
-**Verdict:** Violation V-12, V-13, (V-05 related).
+**Verdict:** Violation V-12, V-15, V-16, (V-05 related).
 
-*Correct points.* `Person`, `Customer` and `Seller` own and expose their own data. `PromotionService.findBestPromotionFor` asks each promotion for its own discount (`promotion.calculateDiscount(sale)`), and `PromotionService.listActivePromotions` asks each promotion whether it is active (`isActive(today)`). `ReturnService.generateMonthlyBalance` does not recompute the sale total: it asks each sale for it (`sale.calculateTotal()`) and each return for its refund (`getRefundAmount()`).
+*Correct points.* `Person`, `Customer` and `Seller` own and expose their own data. `PromotionService.findBestPromotionFor` asks each promotion for its own discount (`promotion.calculateDiscount(sale)`), and `PromotionService.listActivePromotions` and `WarrantyService.listActiveWarranties` ask each promotion or warranty whether it is active (`isActive(today)`). `ReturnService.generateMonthlyBalance` does not recompute the sale total: it asks each sale for it (`sale.calculateTotal()`) and each return for its refund (`getRefundAmount()`).
 
-*Violations.* `ReturnService.viewReturnsByCustomer` navigates a chain of getters to decide who owns a return (V-12). The lookup of a sale by id is reimplemented in two Developer 2 classes although the class that stores sales already offers it (V-13). `AccessoryService.getCompatibleAccessories` decides on data that belongs to the accessory (registered under V-05).
+*Violations.* `ReturnService.viewReturnsByCustomer` navigates a chain of getters to decide who owns a return (V-12). The lookup of a sale by id is reimplemented in two Developer 2 classes although the class that stores sales already offers it (V-15). `WarrantyService` decides on expiry and coverage using data that belongs to the warranty (V-16). `AccessoryService.getCompatibleAccessories` decides on data that belongs to the accessory (registered under V-05).
 
 ### 3.2 Creator
 **Verdict:** Violation (V-07).
 
-*Correct points.* `PersonService.registerCustomer`, `PromotionService.register...Discount` and `ReturnService.registerReturn` create the objects they record from the primitives they receive. `Customer` creates its own `purchaseHistory` because it contains it. The repositories (`PersonRepository`, `AccessoryRepository`, `PromotionRepository`, `ReturnRepository`) create objects in `loadAll` from the file fields, since they hold the initializing data. The creation of the default sellers and accessories is legitimate as an act of creation; the concern about where that seeding lives is registered under High Cohesion (V-02, V-06).
+*Correct points.* `PersonService.registerCustomer`, `PromotionService.register...Discount`, `ReturnService.registerReturn` and `WarrantyService.assignBasicWarranty` / `assignExtendedWarranty` create the objects they record from the primitives they receive, which is the same shape as `ProductService.registerVideoGame`. `Customer` creates its own `purchaseHistory` because it contains it. The repositories (`PersonRepository`, `AccessoryRepository`, `PromotionRepository`, `ReturnRepository`, `WarrantyRepository`) create objects in `loadAll` from the file fields, since they hold the initializing data. The creation of the default sellers and accessories is legitimate as an act of creation; the concern about where that seeding lives is registered under High Cohesion (V-02, V-06).
 
-*Violations.* `AccessoryService.registerController`, `registerCable` and `registerMemory` receive already-built entities, so the caller has to create them (V-07).
+*Violation.* `AccessoryService.registerController`, `registerCable` and `registerMemory` receive already-built entities, so the caller has to create them (V-07).
 
 ### 3.3 Controller
 **Verdict:** Not applicable.
 
 Classes reviewed: all the classes listed in Section 1. None of them receives events from the user interface, and none uses `Scanner` or `System.out`. System events are received by `UI` (Technical Lead), which delegates to the services.
 
-`PromotionRepository` and `ReturnRepository` print to `System.err` when the data file cannot be created. Removing that output would change what the program emits, so it is listed in Section 6 and not registered as a violation.
+`PromotionRepository`, `ReturnRepository` and `WarrantyRepository` print to `System.err` when the data file cannot be created. Removing that output would change what the program emits, so it is listed in Section 6 and not registered as a violation.
 
 ### 3.4 Low Coupling
-**Verdict:** Violation V-03, V-10, V-11, (V-14, V-09 related).
+**Verdict:** Violation V-03, V-10, V-11, V-14, (V-09, V-17 related).
 
 *Correct points.* The services receive their repositories through the constructor and never instantiate them, and the Persons, Accessories and Promotions repositories depend only on the model.
 
-*Violations.* The cyclic dependency between `Customer` and `Sale` (V-03); the persistence layer depending on the service layer in `ReturnRepository` (V-10); and the hidden static dependencies of `ReturnService` (V-11). The services are directly bound to concrete file-based repository classes (V-14), and the file-storage exception is exposed by the promotion service signatures (V-09).
+*Violations.* The cyclic dependency between `Customer` and `Sale` (V-03); the persistence layer depending on the service layer in `ReturnRepository` and `WarrantyRepository` (V-10, V-14); and the hidden static dependencies of `ReturnService` (V-11).
 
 ### 3.5 High Cohesion
 **Verdict:** Violation (V-02, V-06).
 
-`Person`, `Seller`, `PersonService`, `AccessoryService` and `PromotionService` can each be described in one sentence without "and". The violations are the seed data inside the Persons and Accessories repositories (V-02, V-06).
+`Person`, `Seller`, `PersonService`, `AccessoryService`, `PromotionService`, `WarrantyService` and the Promotions, Returns and Warranties repositories can each be described in one sentence without "and". The violations are the seed data inside the Persons and Accessories repositories (V-02, V-06).
 
 `ReturnService.generateMonthlyBalance` consolidates sales and returns, which is not strictly a returns operation. It is not registered as a violation because the Req. 3 specification assigns the balance to this service on purpose, as the service layer class that consolidates both modules.
 
 ### 3.6 Polymorphism
-**Verdict:** Violation (V-01, V-04, V-05, V-08).
+**Verdict:** Violation (V-01, V-04, V-05, V-08, V-13).
 
 *Correct point.* `PromotionService.findBestPromotionFor` works with the abstract `Promotion` and calls `calculateDiscount` without checking the promotion subclass.
 
-*Violations.* The type tests in `PersonRepository` and `PersonService` (V-01), in `AccessoryRepository` (V-04), in `AccessoryService` (V-05), and in `PromotionRepository` (V-08).
+*Violations.* The type tests in the four repositories (V-01, V-04, V-08, V-13) and in `AccessoryService` (V-05).
 
 ### 3.7 Pure Fabrication
 **Verdict:** Correct.
 
-File layout, parsing and writing live in dedicated repository classes, so the model classes (`Person`, `Customer`, `Seller` and the others) contain no I/O code. `AccessoryRepository.joinConsoleIds` and `splitConsoleIds` keep the storage format of the compatible-console list inside the persistence layer. Validation lives in `PersonValidator`, called from `PersonService`, and `ProductRepository`, `PersonRepository` and `SaleRepository` convert `IOException` into `PersistenceException`.
+File layout, parsing and writing live in dedicated repository classes, so the model classes (`Person`, `Customer`, `Seller` and the others) contain no I/O code. `AccessoryRepository.joinConsoleIds` and `splitConsoleIds` keep the storage format of the compatible-console list inside the persistence layer. Validation lives in `PersonValidator` and `ProductValidator`, called from `PersonService` and `ProductService`, and `ProductRepository`, `PersonRepository` and `SaleRepository` convert `IOException` into `PersistenceException`.
 
 The preparation of the data file (`ensureFileExists`) is repeated in each repository. It is not registered because it sits in the class that should own it, so it does not break the criterion.
 
 ### 3.8 Indirection
-**Verdict:** Violation (V-10, V-14).
+**Verdict:** Violation V-17, (V-10, V-14 related).
 
-*Correct points.* Callers obtain people, accessories, promotions and returns through their services instead of reading files, and the repositories sit between the services and the files.
+*Correct points.* Callers obtain people, accessories, promotions and warranties through their services instead of reading files, and the repositories sit between the services and the files.
 
-*Violations.* The services are bound directly to the concrete file-based repository classes (V-14), and the persistence layer reaches the services directly in `ReturnRepository` (V-10).
+*Violations.* The services are bound directly to the concrete file-based repository classes (V-17), and the persistence layer reaches the services directly in `ReturnRepository` and `WarrantyRepository` (V-10, V-14).
 
 ### 3.9 Protected Variations
-**Verdict:** Violation V-09, (V-01, V-04, V-08, V-14 related).
+**Verdict:** Violation V-09, (V-01, V-04, V-08, V-13, V-17 related).
 
-The unprotected variation points are the storage mechanism, whose `java.io` exception leaks into the promotion service signatures (V-09), and the addition of new person, accessory or promotion types, whose type-dependent conditionals are registered under Polymorphism (V-01, V-04, V-08). The direct dependency on concrete repositories is registered under Indirection (V-14).
+The unprotected variation points are the storage mechanism, whose `java.io` exception leaks into the promotion service signatures (V-09), and the addition of new person, accessory, promotion or warranty types, whose type-dependent conditionals are registered under Polymorphism (V-01, V-04, V-08, V-13). The direct dependency on concrete repositories is registered under Indirection (V-17).
 
 *Correct points.* `PromotionService.findBestPromotionFor` does not change when a new promotion type is added, `PersistenceException` isolates the upper layers from storage errors in `PersonRepository`, `ProductRepository` and `SaleRepository`, and the repository constructors that receive a `filePath` allow changing the file location without touching the classes.
 
@@ -111,6 +110,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | In the persistence package, introduce a small serializer abstraction per person type (it states whether it handles a given person, converts it to a line, and rebuilds it from the fields), with one implementation for `Customer` and one for `Seller`. `PersonRepository` iterates over the available serializers instead of branching. The typed lookups in the repository and in the service are replaced by one generic method parameterized by type. The file format stays identical. |
 | Code from another team member | No |
 
+
 ### V-02
 
 | Field | Content |
@@ -123,6 +123,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | Changing the preloaded sellers requires editing a persistence class. Creating a repository modifies the file, which makes it harder to reuse or test in isolation. |
 | Proposed solution | Move the seed data and its initialization to a dedicated initializer class (Pure Fabrication) that uses the repository through `loadAll` and `saveAll`, and call it at startup. The file content after startup must remain identical. |
 | Code from another team member | Yes: `Main` (Technical Lead), the composition root, would call the initializer. |
+
 
 ### V-03
 
@@ -137,6 +138,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Remove the history from `Customer` (attribute, getter and `addPurchase`) and rely on `SaleService.getSalesByCustomer`. Any class that uses these members is adapted to that service method. |
 | Code from another team member | Only if other classes use `getPurchaseHistory` or `addPurchase`; their owner adapts them. |
 
+
 ### V-04
 
 | Field | Content |
@@ -149,6 +151,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | Adding a new accessory type (for example, a headset) requires editing both methods. If `saveAll` is not updated, accessories of the new type are silently not saved because there is no `else` branch. |
 | Proposed solution | Same design as V-01: one serializer per accessory type behind a common abstraction in the persistence package, with the repository iterating over them. The file format and the `CONTROLLER`/`CABLE`/`MEMORY` tags stay identical. |
 | Code from another team member | No |
+
 
 ### V-05
 
@@ -163,6 +166,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Let `Accessory` answer both questions (an identifier of its type, and whether it is compatible with a console) and make the service iterate over `Accessory` without casts or type strings. The results for the current data must remain identical, and the text printed by `UI` for the type keeps its current content. |
 | Code from another team member | Yes: `Accessory` (Developer 1) provides the type identifier, and `UI` (Technical Lead) adapts its accessory-type menu. Related to boundary candidate B-6 of `grasp-analysis.md`. |
 
+
 ### V-06
 
 | Field | Content |
@@ -175,6 +179,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | Changing the preloaded accessories requires editing a persistence class, and the seed data silently depends on a console `CON001` existing in another file. |
 | Proposed solution | Same approach as V-02: move the seed data to a dedicated initializer (Pure Fabrication), keeping the file content after startup identical. |
 | Code from another team member | Yes: `Main` (Technical Lead), the composition root, would call the initializer. |
+
 
 ### V-07
 
@@ -189,6 +194,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | `AccessoryService.registerController`, `registerCable` and `registerMemory` receive primitives and create the entity, as `ProductService` does. The persisted result must stay identical, including the order in which the compatible consoles are set, which the Technical Lead describes in B-5. |
 | Code from another team member | Yes: `UI` (Technical Lead) removes its `new` calls after the service signatures change. Developer 2 changes the service first. |
 
+
 ### V-08
 
 | Field | Content |
@@ -201,6 +207,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | Adding a new promotion type requires editing both methods. If `saveAll` is not updated, promotions of the new type are silently not saved because there is no `else` branch. |
 | Proposed solution | Same design as V-01 and V-04: one serializer per promotion type behind a common abstraction in the persistence package. The file format and the `PERCENTAGE`/`CATEGORY`/`BULK` tags stay identical. |
 | Code from another team member | No |
+
 
 ### V-09
 
@@ -215,6 +222,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Remove the unnecessary `throws FileNotFoundException` declarations and the `java.io` imports from the service. Behavior does not change because the exception is never thrown. |
 | Code from another team member | Yes: `SaleService.registerSale` and the promotion methods of `UI` (Technical Lead) declare or handle this exception; a `catch` of `FileNotFoundException` that can no longer be thrown would stop compiling and is removed by its owner. |
 
+
 ### V-10
 
 | Field | Content |
@@ -227,6 +235,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Consequence | `ReturnRepository` cannot be used without the services being initialized first, because their static state is set in their constructors. Any change to the `SaleService` or `ProductService` API breaks the repository, and a cycle between the service and persistence layers becomes possible. |
 | Proposed solution | The repository must not know the services. Return only the stored data (ids) from the repository and resolve the `Sale` and `Product` references in `ReturnService`, the same shape as `SaleRepository` and `SaleService`. Remove the dead fields, setters and method. The file format stays identical. |
 | Code from another team member | Yes: `Main` (Technical Lead) calls `setSaleService` and `setProductService`, and removes those calls last. Related to boundary candidate B-1 of `grasp-analysis.md` (Developer 2 changes first). |
+
 
 ### V-11
 
@@ -241,6 +250,7 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Keep the injected `SaleService` and `ProductService` in fields and call them through the instance references. This compiles with the current static methods, so it can be done first, and the Technical Lead removes `static` later without affecting this class. |
 | Code from another team member | No for the first step. The Technical Lead later makes the `SaleService` methods instance methods (boundary candidate B-2 of `grasp-analysis.md`). |
 
+
 ### V-12
 
 | Field | Content |
@@ -254,11 +264,40 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Add a question method to `Return` (for example, whether it belongs to a customer id) and make the service call it. The results stay identical. |
 | Code from another team member | Yes: `Return` belongs to Developer 1. |
 
+
 ### V-13
 
 | Field | Content |
 |---|---|
 | ID | V-13 |
+| Pattern | Polymorphism (guiding pattern); also Protected Variations |
+| Module | Warranties (Req. 4) |
+| Evidence | `WarrantyRepository.saveAll`: `if (warranty instanceof BasicWarranty) { type = "BASIC"; } else if (warranty instanceof ExtendedWarranty) { type = "EXTENDED"; } else { continue; }`.<br>`WarrantyRepository.loadAll`: `if (type.equals("BASIC")) { ... } else if (type.equals("EXTENDED")) { ... }`. |
+| Explanation | The warranty hierarchy is polymorphic for duration, type name and cost, but not for persistence: the tag written to the file and the class rebuilt when reading are decided with type tests in the repository. |
+| Consequence | Adding a new warranty type requires editing both methods, and the explicit `continue` in `saveAll` silently drops any warranty of a type that is not listed. |
+| Proposed solution | Same design as V-01, V-04 and V-08: one entry per warranty type (tag and way to rebuild it) behind a common abstraction in the persistence package. The file format and the `BASIC`/`EXTENDED` tags stay identical. |
+| Code from another team member | No |
+
+
+### V-14
+
+| Field | Content |
+|---|---|
+| ID | V-14 |
+| Pattern | Low Coupling (guiding pattern); also Indirection |
+| Module | Warranties (Req. 4) |
+| Evidence | `WarrantyRepository` (package `persistence`) imports `...service.ProductService` and `...service.SaleService`.<br>`WarrantyRepository(ProductService productService)` calls `this("data/warranties.csv", null, productService);` and the sale service is set later with `setSaleService`.<br>`WarrantyRepository.findSaleById`: `for (Sale sale : saleService.getAllSales()) { ... }`; `WarrantyRepository.loadAll`: `productService.findById(data[2])`. |
+| Explanation | Same problem as V-10: the persistence layer depends on a component of a higher layer. In addition, the repository is built in two steps (a `null` sale service first, a setter afterwards), and `getAllSales` is a static method invoked through an instance reference, which hides the static dependency. |
+| Consequence | The repository is only valid after the setter has been called by the code that wires the application, and any change to the `SaleService` or `ProductService` API breaks it. It also uses a different injection mechanism from `ReturnRepository`. |
+| Proposed solution | Same as V-10: the repository returns only the stored data (ids), and `WarrantyService` resolves the `Product` and `Sale` references. Remove the `null` argument and the setter. The file format stays identical. |
+| Code from another team member | Yes: `Main` (Technical Lead) calls `setSaleService` and removes it last. Related to boundary candidate B-1 of `grasp-analysis.md` (Developer 2 changes first). |
+
+
+### V-15
+
+| Field | Content |
+|---|---|
+| ID | V-15 |
 | Pattern | Information Expert (guiding pattern); also Low Coupling |
 | Module | Returns (Req. 3) and Warranties (Req. 4) |
 | Evidence | `ReturnService.findSaleById`: `for (Sale sale : SaleService.getAllSales()) { if (sale.getId().equals(saleId)) { return sale; } }`.<br>`WarrantyRepository.findSaleById`: the same loop over `saleService.getAllSales()`.<br>`ReturnRepository.loadAll` uses `SaleService.findById(saleId)` for the same purpose. |
@@ -267,25 +306,43 @@ The unprotected variation points are the storage mechanism, whose `java.io` exce
 | Proposed solution | Use the single existing lookup of `SaleService` (`findById`) in all three places. Once V-10 and V-14 are corrected, the lookup only remains in `ReturnService` and `WarrantyService`. |
 | Code from another team member | No |
 
-### V-14
+
+### V-16
 
 | Field | Content |
 |---|---|
-| ID | V-14 |
+| ID | V-16 |
+| Pattern | Information Expert |
+| Module | Warranties (Req. 4) |
+| Evidence | `WarrantyService.listWarrantiesExpiringSoon`: `LocalDate endDate = warranty.getEndDate(); if (!endDate.isBefore(today) && !endDate.isAfter(limit)) { ... }`.<br>`WarrantyService.findWarrantyByProduct`: `warranty.getProduct().getId().equals(productId) && warranty.getSale().getId().equals(saleId)`. |
+| Explanation | `Warranty` already answers whether it is active (`isActive`), but the questions "does it expire soon" and "does it cover this product in this sale" are answered by the service, using the dates and the getter chains `Warranty → Product → id` and `Warranty → Sale → id`. |
+| Consequence | If the way a warranty stores its dates, product or sale changes, the service breaks, and the expiry rule is separated from `isActive`, which lives in the warranty. |
+| Proposed solution | Add two question methods to `Warranty` (one for the expiry window and one for coverage of a product in a sale) and make the service call them. The results stay identical. |
+| Code from another team member | Yes: `Warranty` belongs to Developer 1. |
+
+
+### V-17
+
+| Field | Content |
+|---|---|
+| ID | V-17 |
 | Pattern | Indirection (guiding pattern); also Protected Variations and Low Coupling |
-| Module | Persons, Accessories, Promotions and Returns |
-| Evidence | `PersonService(PersonRepository repository)`, `AccessoryService(AccessoryRepository repository)`, `PromotionService(PromotionRepository repository)` and `ReturnService(ReturnRepository repository, ...)`: each service keeps a field typed with the concrete file-based repository class, and no interface exists for any of these repositories. |
+| Module | Persons, Accessories, Promotions, Returns and Warranties |
+| Evidence | `PersonService(PersonRepository repository)`, `AccessoryService(AccessoryRepository repository)`, `PromotionService(PromotionRepository repository)`, `ReturnService(ReturnRepository repository, ...)` and `WarrantyService(WarrantyRepository repository)`: each service keeps a field typed with the concrete file-based repository class, and no interface exists for any repository. |
 | Explanation | The services and their storage are bound directly, and the storage is one of the likely changes of the project (a database instead of files). An interface between them does not exist. |
-| Consequence | Changing the storage would require editing the repository type in the four services and the code that wires them, instead of adding one new implementation. |
+| Consequence | Changing the storage would require editing the type of the repository in the five services and the code that wires them, instead of adding one new implementation. |
 | Proposed solution | Define one repository interface per module in the persistence package, implemented by the current file-based repositories, and make the services depend on the interface. Behavior and data files do not change, and `Main` keeps compiling because it passes the concrete repository where the interface is expected. |
 | Code from another team member | No for the Developer 2 classes. `ProductService` (Developer 1) and `SaleService` (Technical Lead) have the same shape and are reported by their owners. |
+
 
 ## 5. Issues reported to the Technical Lead
 
 | Class / method | Owner | Description and evidence |
 |---|---|---|
-| Static API of `SaleService` and `ProductService` | Technical Lead / Developer 1 | `SaleService` keeps its collaborators in `static` fields and exposes `static` methods (`getAllSales`, `findById`). `ProductService` keeps its repository in a `static` field and exposes `static` `findById` and `update`, while `restoreStock` is an instance method. This is the origin of V-10 and V-11. The Developer 2 callers that use class names are `ReturnService` (`SaleService.getAllSales`, `ProductService.restoreStock`) and `ReturnRepository` (`SaleService.findById`, `ProductService.findById`). Related to B-2. |
-| Answers to open VERIFY items of `grasp-analysis.md` | Technical Lead | **Monthly balance hot spot:** `ReturnService.generateMonthlyBalance` does not recompute the final total; it uses `sale.calculateTotal()` (see Section 6). |
+| `SaleService.registerSale` and `buildSale` (accessories) | Technical Lead | `Accessory` is a `Product`, but it is stored and queried through a parallel service and repository, so `SaleService` has to branch: `if (product == null) { product = (Product) accessoryService.findById(productId); }` and `if (product instanceof Accessory) { accessoryService.update((Accessory) product); } else { productService.update(product); }`. On the Developer 2 side, `AccessoryService.findById` and `update` mirror the `ProductService` API with a different type. Related to boundary candidate B-4. |
+| Static API of `SaleService` and `ProductService` | Technical Lead / Developer 1 | `SaleService` keeps its collaborators in `static` fields and exposes `static` methods (`getAllSales`, `findById`). `ProductService` keeps its repository in a `static` field and exposes `static` `findById` and `update`, while `restoreStock` is an instance method. This is the origin of V-10, V-11 and V-14. The Developer 2 callers that use class names are `ReturnService` (`SaleService.getAllSales`, `ProductService.restoreStock`) and `ReturnRepository` (`SaleService.findById`, `ProductService.findById`); `WarrantyRepository` already uses an instance reference. Related to B-2. |
+| Answers to open VERIFY items of `grasp-analysis.md` | Technical Lead | **D-3:** `WarrantyService.assignExtendedWarranty` returns the warranty and does not touch the sale total, so nothing in Developer 2 code adds the additional cost.<br>**D-5:** `AccessoryService.registerAccessory` saves the full list (`repository.saveAll`) before returning, so any change made to the entity afterwards, such as setting compatible consoles, is not persisted unless `update` is called.<br>**D-8:** `WarrantyService.assignBasicWarranty` and `assignExtendedWarranty` persist immediately (`repository.saveAll`), before `SaleService` calls `saleRepository.save(sale)`.<br>**Monthly balance hot spot:** `ReturnService.generateMonthlyBalance` does not recompute the final total; it uses `sale.calculateTotal()` (see Section 6). |
+| `ProductService.registerConsole` | Developer 1 / Technical Lead | The method has no call to `ProductValidator.validateProductData`, while `registerVideoGame` has it. See Section 6. |
 
 ## 6. Possible functional defects and items outside scope
 
@@ -293,6 +350,8 @@ These items were found by reading the code. They change what the user or the dat
 
 | Class / method | Evidence | Observed behavior / reason |
 |---|---|---|
+| Warranties of the same sale (`WarrantyRepository.loadAll`, `WarrantyService.assign...`, `SaleService.registerSale`) | `WarrantyRepository.loadAll`: `Sale sale = findSaleById(data[3]); ... if (product == null \|\| sale == null) continue;`. `WarrantyService.assignBasicWarranty` / `assignExtendedWarranty`: `repository.loadAll()`, `add`, `repository.saveAll(...)`. `SaleService.registerSale` creates the warranties before `saleRepository.save(sale)`. Related to D-8. | The sale is not stored yet when the second warranty of the same sale is created, so the first one is skipped when loading and is not written back by `saveAll`. A sale with two warranties (two consoles, or a console with an extended warranty) would keep only the last one. |
 | `ReturnService.generateMonthlyBalance` | `totalSales += sale.calculateTotal();` and `totalReturns += returnItem.getRefundAmount();` | `calculateTotal()` sums product prices only, so the balance does not subtract promotion discounts (and, according to D-2, sales reloaded from the file do not carry the discount), nor does it include warranty costs (D-3). Correcting it changes the figures shown. |
 | `PersonRepository`, `AccessoryRepository`, `PromotionRepository`, `ReturnRepository` (`saveAll` / `loadAll`) | Fields are joined with `","` and read with `line.split(",")`. The free-text fields are `name`, `title` and the return `reason`. | A value containing a comma shifts the fields when the record is read back, or truncates the return reason. |
-| Error handling and console output of Accessories, Promotions and Returns | `AccessoryRepository`, `PromotionRepository` and `ReturnRepository`: `throw new RuntimeException("Error saving ...", e)`. `PromotionRepository` and `ReturnRepository`: `ensureFileExists` only prints `System.err`. `AccessoryService` and `ReturnService`: `throw new IllegalArgumentException(...)` with English messages (for example, `"A return must include at least one product"`). | These classes were not covered by the Req. 6 refactor, so their errors do not use the custom exception hierarchy, and two repositories write to the console outside `UI`. The Req. 3 specification also asks for Spanish messages in `ReturnService`. Changing the exception types, the messages or the `System.err` output changes what the program shows or emits, which the team's verification plan treats as behavior to preserve. |
+| `ProductService.registerConsole` | `registerConsole` creates the `Console` directly, while `registerVideoGame` calls `ProductValidator.validateProductData` first, and the JavaDoc of both says they validate. | A console with invalid data is accepted and a video game is rejected. Adding the validation would reject inputs that are accepted today. |
+| Error handling and console output of Accessories, Promotions, Returns and Warranties | `AccessoryRepository`, `PromotionRepository`, `ReturnRepository`, `WarrantyRepository`: `throw new RuntimeException("Error saving ...", e)`. `PromotionRepository`, `ReturnRepository` and `WarrantyRepository`: `ensureFileExists` only prints `System.err`. `AccessoryService` and `ReturnService`: `throw new IllegalArgumentException(...)` with English messages (for example, `"A return must include at least one product"`). | These classes were not covered by the Req. 6 refactor, so their errors do not use the custom exception hierarchy, and three repositories write to the console outside `UI`. The Req. 3 specification also asks for Spanish messages in `ReturnService`. Changing the exception types, the messages or the `System.err` output changes what the program shows or emits, which the team's verification plan treats as behavior to preserve. |
