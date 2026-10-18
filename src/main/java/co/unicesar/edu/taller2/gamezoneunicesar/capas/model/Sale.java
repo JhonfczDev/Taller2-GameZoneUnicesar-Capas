@@ -267,4 +267,11 @@ public class Sale {
         long daysBetween = ChronoUnit.DAYS.between(this.date, returnDate);
         return daysBetween >= 0 && daysBetween <= 30;
     }
+
+    public boolean isForCustomer(String customerId){
+        if (this.customer == null){
+            return false;
+        }
+        return this.customer.getId().equals(customerId);
+    }
 }

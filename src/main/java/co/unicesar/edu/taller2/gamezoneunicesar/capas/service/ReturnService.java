@@ -60,7 +60,7 @@ public class ReturnService {
         List<Return> result = new ArrayList<>();
 
         for (Return returnItem : repository.loadAll()) {
-            if (returnItem.getSale().getCustomer().getId().equals(customerId)) {
+            if (returnItem.isForCustomer(customerId)){
                 result.add(returnItem);
             }
         }

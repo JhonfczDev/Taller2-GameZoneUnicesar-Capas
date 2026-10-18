@@ -71,6 +71,13 @@ public class Return {
         return receipt.toString();
     }
 
+    public boolean isForCustomer(String customerId){
+        if (this.sale == null){
+            return false;
+        }
+        return this.sale.isForCustomer(customerId);
+    }
+
     public String getId() {
         return id;
     }
