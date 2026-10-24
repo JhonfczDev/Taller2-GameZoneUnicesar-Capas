@@ -28,7 +28,7 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 | Controller | Not Aplicable | -                |
 | Low Coupling | Violation     | V-D1-03          |
 | High Cohesion | Correct       | -                |
-| Polymorphism |               |                  |
+| Polymorphism | Violation     | V-D1-04          |
 | Pure Fabrication |               |                  |
 | Indirection |               |                  |
 | Protected Variations |               |                  |
@@ -64,6 +64,12 @@ None of the classes under Developer 1's responsibility receive raw system input 
 
 The domain classes (`Product`, `Accessory`, `Promotion`, `Warranty`, `Return`) and validation classes (`ProductValidator`) maintain a single, focused responsibility clearly describable without conjunctions.
 
+### 3.6 Polymorphism
+**Veredict:** Violation (V-D1-04).
+
+*Correct points.* `PromotionService` correctly evaluates and finds the best promotion by calling `calculateDiscount(sale)` purely polymorphically whithout type checks.
+
+*Violations.* `PromotionRepository` breaks polymorphism by using `instanceof` checks to handle the persistence and serialization of specific promotion subtypes.
 
 
 ---
