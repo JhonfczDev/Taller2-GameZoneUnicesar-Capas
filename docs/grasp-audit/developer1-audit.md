@@ -27,7 +27,7 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 | Creator | Correct       | -                |
 | Controller | Not Aplicable | -                |
 | Low Coupling | Violation     | V-D1-03          |
-| High Cohesion |               |                  |
+| High Cohesion | Correct       | -                |
 | Polymorphism |               |                  |
 | Pure Fabrication |               |                  |
 | Indirection |               |                  |
@@ -59,6 +59,10 @@ None of the classes under Developer 1's responsibility receive raw system input 
 
 *Violation.* The `Return` class and `Sale.canBeReturned` introduce tight coupling between the returns module and the product/sale states, creating bidirectional awareness across module boundaries.
 
+### 3.5 High Cohesion
+**Verdict:** Correct.
+
+The domain classes (`Product`, `Accessory`, `Promotion`, `Warranty`, `Return`) and validation classes (`ProductValidator`) maintain a single, focused responsibility clearly describable without conjunctions.
 
 
 
