@@ -29,8 +29,8 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 | Low Coupling | Violation     | V-D1-03          |
 | High Cohesion | Correct       | -                |
 | Polymorphism | Violation     | V-D1-04          |
-| Pure Fabrication |               |                  |
-| Indirection |               |                  |
+| Pure Fabrication | Correct       | -                |
+| Indirection | Not Aplicable | -                |
 | Protected Variations |               |                  |
 
 ---
@@ -70,6 +70,18 @@ The domain classes (`Product`, `Accessory`, `Promotion`, `Warranty`, `Return`) a
 *Correct points.* `PromotionService` correctly evaluates and finds the best promotion by calling `calculateDiscount(sale)` purely polymorphically whithout type checks.
 
 *Violations.* `PromotionRepository` breaks polymorphism by using `instanceof` checks to handle the persistence and serialization of specific promotion subtypes.
+
+### 3.7 Pure Fabrication
+
+*Veredict:* Correct
+
+`ProductValidator` acts as a pure fabrication utility class designed specifically to encapsulate validation algorithms away from pure domain entities and persistence managers.
+
+### 3.8 Indirection
+**Verdict:** Not applicable.
+
+Direct collaborations between domain services, validators, and repositories within Developer 1's scope do not require intermediate broker abstractions beyond standard architectural layering.
+
 
 
 ---
@@ -114,4 +126,18 @@ The domain classes (`Product`, `Accessory`, `Promotion`, `Warranty`, `Return`) a
 | Consequence | Changes in product or sale identifiers cascade into breaking adjustments in the return evaluation logic. |
 | Proposed solution | Apply Law of Demeter delegation principles (such as `isForCustomer` or direct domain queries) to isolate object interaction. |
 | Code from another team member | Yes: Involves `Sale` (Technical Lead). |
+
+### V-D1-04
+
+| Field | Content |
+|---|---|
+| ID | V-D1-04 |
+| Pattern | Polymorphism |
+| Module | Promotions Persistence (`PromotionRepository`) |
+| Evidence | `PromotionRepository` uses `instanceof` checks to handle the serialization/deserialization of promotion subtypes. |
+| Explanation | Relying on `instanceof` inside the repository forces modifications whenever a new promotion type is added, bypassing polymorphic serialization. |
+| Consequence | High rigidity in the persistence layer, making the system difficult to extend with new promotion categories without altering core repository logic. |
+| Proposed solution | Implement polymorphic persistence or self-formatting serialization in promotion subclasses. |
+| Code from another team member | Yes: `PromotionRepository` involves logic tied with shared persistence structures. |
+
 
