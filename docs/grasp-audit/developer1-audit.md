@@ -31,7 +31,7 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 | Polymorphism | Violation     | V-D1-04          |
 | Pure Fabrication | Correct       | -                |
 | Indirection | Not Aplicable | -                |
-| Protected Variations |               |                  |
+| Protected Variations | Violation     | V-D1-05          |
 
 ---
 
@@ -72,8 +72,7 @@ The domain classes (`Product`, `Accessory`, `Promotion`, `Warranty`, `Return`) a
 *Violations.* `PromotionRepository` breaks polymorphism by using `instanceof` checks to handle the persistence and serialization of specific promotion subtypes.
 
 ### 3.7 Pure Fabrication
-
-*Veredict:* Correct
+**Veredict:** Correct
 
 `ProductValidator` acts as a pure fabrication utility class designed specifically to encapsulate validation algorithms away from pure domain entities and persistence managers.
 
@@ -82,7 +81,10 @@ The domain classes (`Product`, `Accessory`, `Promotion`, `Warranty`, `Return`) a
 
 Direct collaborations between domain services, validators, and repositories within Developer 1's scope do not require intermediate broker abstractions beyond standard architectural layering.
 
+### 3.9 Protected Variations
+**Veredict:** Violation (V-D1-05).
 
+*Violation.* Direct data manipulation and hardcoded field validations in validators expose internal attributes to structural modifications, creating variation points when adding new product types or criteria.
 
 ---
 
@@ -140,4 +142,15 @@ Direct collaborations between domain services, validators, and repositories with
 | Proposed solution | Implement polymorphic persistence or self-formatting serialization in promotion subclasses. |
 | Code from another team member | Yes: `PromotionRepository` involves logic tied with shared persistence structures. |
 
+### V-D1-05
 
+| Field | Content |
+|---|---|
+| ID | V-D1-05 |
+| Pattern | Protected Variations |
+| Module | Exceptions and validations (Req. 6) |
+| Evidence | `ProductValidator` explicitly validates primitive fields using hardcoded conditional strings. |
+| Explanation | Lack of an abstract validation rule structure exposes validation routines to frequent changes when adding product fields. |
+| Consequence | Adding new product attributes forces modification of core validation logic blocks. |
+| Proposed solution | Encapsulate validation rules into modular predicate or validator components. |
+| Code from another team member | No |
