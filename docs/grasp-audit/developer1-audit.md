@@ -21,17 +21,17 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 
 ## 2. Verdict summary
 
-| Pattern | Verdict | Violation IDs |
-|---|--|--|
-| Information Expert | Violation | V-D1-01, V-D1-02 |
-| Creator |  |  |
-| Controller |  |  |
-| Low Coupling |  |  |
-| High Cohesion |  |  |
-| Polymorphism |  |  |
-| Pure Fabrication |  |  |
-| Indirection |  |  |
-| Protected Variations |  |  |
+| Pattern | Verdict       | Violation IDs    |
+|---|---------------|------------------|
+| Information Expert | Violation     | V-D1-01, V-D1-02 |
+| Creator | Correct       | -                |
+| Controller | Not Aplicable | -                |
+| Low Coupling | Violation     | V-D1-03          |
+| High Cohesion |               |                  |
+| Polymorphism |               |                  |
+| Pure Fabrication |               |                  |
+| Indirection |               |                  |
+| Protected Variations |               |                  |
 
 ---
 
@@ -43,6 +43,24 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 *Correct points.* `Product`, `VideoGame`, and `Console` manage their own attributes and calculate specific values inherent to their state. `Promotion` and its subclasses correctly calculate their respective discounts (`calculateDiscount(Sale sale)`).
 
 *Violations.* `ProductRepository` contains business evaluation logic regarding stock thresholds instead of delegating it fully to `Product`. Furthermore, `Return` evaluates return eligibility rules inside `Sale.canBeReturned` by querying external states rather than keeping self-contained validation rules inside the domain models.
+
+### 3.2 Creator
+**Verdict:** Correct.
+
+Factories and services such as `ProductService` correctly instantiate domain objects (`VideoGame`, `Console`) from primitive parameters received from the UI layer. Aggregate roots properly instantiate their immediate components.
+
+### 3.3 Controller
+**Verdict:** Not applicable.
+
+None of the classes under Developer 1's responsibility receive raw system input events or handle user interface scanners directly; UI event management is handled strictly by the `UI` class (Technical Lead).
+
+### 3.4 Low Coupling
+**Verdict:** Violation (V-D1-03).
+
+*Violation.* The `Return` class and `Sale.canBeReturned` introduce tight coupling between the returns module and the product/sale states, creating bidirectional awareness across module boundaries.
+
+
+
 
 ---
 
@@ -73,3 +91,17 @@ The verdict criteria and the evidence rules are the ones agreed by the team in `
 | Consequence | High vulnerability to null-pointer exceptions and structural coupling if data schemas change. |
 | Proposed solution | Refactor return validation criteria into self-contained methods inside `Sale` and `Return`. |
 | Code from another team member | Yes: `Sale` belongs to the Technical Lead. |
+
+### V-D1-03
+
+| Field | Content |
+|---|---|
+| ID | V-D1-03 |
+| Pattern | Low Coupling |
+| Module | Returns (Req. 3) and Products |
+| Evidence | `Return` class imports and references `Sale` and `Product` directly with deep getter chains. |
+| Explanation | High inter-module entanglement between returns, sales, and products increases maintenance friction. |
+| Consequence | Changes in product or sale identifiers cascade into breaking adjustments in the return evaluation logic. |
+| Proposed solution | Apply Law of Demeter delegation principles (such as `isForCustomer` or direct domain queries) to isolate object interaction. |
+| Code from another team member | Yes: Involves `Sale` (Technical Lead). |
+
