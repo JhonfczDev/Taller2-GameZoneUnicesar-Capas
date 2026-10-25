@@ -10,9 +10,41 @@ import java.io.*;
 public class WarrantyService {
 
     private WarrantyRepository repository;
+    private ProductService productService;
+    private SaleService saleService;
 
+    /**
+     * Old form of the constructor, kept only until {@code Main} uses the new one.
+     *
+     * @param repository repository used to persist and retrieve warranties
+     * @deprecated use {@link #WarrantyService(WarrantyRepository, ProductService)}
+     */
+    @Deprecated
     public WarrantyService(WarrantyRepository repository) {
         this.repository = repository;
+    }
+
+    /**
+     * Creates a new {@code WarrantyService} that will resolve the products of the
+     * stored warranties through the given service. The sale service is set later
+     * with {@link #setSaleService(SaleService)}, because {@code SaleService}
+     * itself needs this service in its constructor.
+     *
+     * @param repository     repository used to persist and retrieve warranties
+     * @param productService service used to look up products
+     */
+    public WarrantyService(WarrantyRepository repository, ProductService productService) {
+        this.repository = repository;
+        this.productService = productService;
+    }
+
+    /**
+     * Sets the service used to look up the sales of the stored warranties.
+     *
+     * @param saleService service used to look up sales
+     */
+    public void setSaleService(SaleService saleService) {
+        this.saleService = saleService;
     }
 
     private String generateWarrantyId() {

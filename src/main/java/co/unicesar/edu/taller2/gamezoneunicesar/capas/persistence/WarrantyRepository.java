@@ -13,7 +13,15 @@ public class WarrantyRepository {
     private File file;
     private SaleService saleService;
     private ProductService productService;
-    
+
+    /**
+     * Creates a repository that uses the default file path and does not need
+     * any service. It is the form that {@code Main} will use once it is migrated.
+     */
+    public WarrantyRepository() {
+        this("data/warranties.csv", null, null);
+    }
+
     public WarrantyRepository(ProductService productService) {
         this("data/warranties.csv", null, productService);
     }
@@ -127,7 +135,5 @@ public class WarrantyRepository {
     public void setSaleService(SaleService saleService) {
         this.saleService = saleService;
     }
-    
-    
-    
+
 }
