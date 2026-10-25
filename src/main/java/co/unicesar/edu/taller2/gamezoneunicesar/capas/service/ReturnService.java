@@ -13,11 +13,32 @@ import java.util.UUID;
 public class ReturnService {
 
     private ReturnRepository repository;
+    private final SaleService saleService;
+    private final ProductService productService;
 
+    /**
+     * Creates a new {@code ReturnService} that keeps and uses the collaborators it receives.
+     *
+     * @param repository     repository used to persist and retrieve returns
+     * @param saleService    service used to look up sales
+     * @param productService service used to restore the stock of returned products
+     */
     public ReturnService(ReturnRepository repository, SaleService saleService, ProductService productService) {
         this.repository = repository;
+        this.saleService = saleService;
+        this.productService = productService;
     }
 
+    /**
+     * Registers a return for one or more products of an existing sale.
+     *
+     * @param saleId     id of the original sale
+     * @param productIds ids of the products being returned
+     * @param reason     reason for the return
+     * @return the registered return
+     * @throws IllegalArgumentException if the list is empty, the sale does not exist,
+     *                                  the 30-day period expired or a product is not in the sale
+     */
     public Return registerReturn(String saleId, List<String> productIds, String reason) {
         if (productIds == null || productIds.isEmpty()) {
             throw new IllegalArgumentException("A return must include at least one product");
@@ -41,7 +62,7 @@ public class ReturnService {
         newReturn.calculateRefundAmount();
 
         for (Product product : returnedProducts) {
-            ProductService.restoreStock(product.getId(), 1);
+            productService.restoreStock(product.getId(), 1);
         }
 
         List<Return> returns = repository.loadAll();
@@ -52,10 +73,21 @@ public class ReturnService {
         return newReturn;
     }
 
+    /**
+     * Retrieves every stored return.
+     *
+     * @return the list of all returns
+     */
     public List<Return> viewAllReturns() {
         return repository.loadAll();
     }
 
+    /**
+     * Retrieves the returns whose sale belongs to the given customer.
+     *
+     * @param customerId id of the customer
+     * @return the matching returns
+     */
     public List<Return> viewReturnsByCustomer(String customerId) {
         List<Return> result = new ArrayList<>();
 
@@ -68,6 +100,12 @@ public class ReturnService {
         return result;
     }
 
+    /**
+     * Retrieves the returns associated with a sale.
+     *
+     * @param saleId id of the sale
+     * @return the matching returns
+     */
     public List<Return> viewReturnsBySale(String saleId) {
         List<Return> result = new ArrayList<>();
 
@@ -80,9 +118,17 @@ public class ReturnService {
         return result;
     }
 
+    /**
+     * Calculates the monthly balance: total of the sales of the month minus the
+     * total refunded in the same month.
+     *
+     * @param month month to evaluate (1-12)
+     * @param year  year to evaluate
+     * @return the net balance of the period
+     */
     public double generateMonthlyBalance(int month, int year) {
         double totalSales = 0.0;
-        for (Sale sale : SaleService.getAllSales()) {
+        for (Sale sale : saleService.getAllSales()) {
             LocalDate saleDate = sale.getDate();
             if (saleDate.getMonthValue() == month && saleDate.getYear() == year) {
                 totalSales += sale.calculateTotal();
@@ -92,7 +138,7 @@ public class ReturnService {
         double totalReturns = 0.0;
         for (Return returnItem : repository.loadAll()) {
             LocalDate returnDate = returnItem.getReturnDate();
-            
+
             if (returnDate.getMonthValue() == month && returnDate.getYear() == year) {
                 totalReturns += returnItem.getRefundAmount();
             }
@@ -102,7 +148,7 @@ public class ReturnService {
     }
 
     private Sale findSaleById(String saleId) {
-        for (Sale sale : SaleService.getAllSales()) {
+        for (Sale sale : saleService.getAllSales()) {
             if (sale.getId().equals(saleId)) {
                 return sale;
             }
@@ -138,7 +184,6 @@ public class ReturnService {
     private String generateReturnId() {
         return "R" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
-    
-   
+
 }
 
