@@ -51,7 +51,7 @@ public class WarrantyService {
 
         for (WarrantyRecord row : repository.loadRecords()) {
             Product product = productService.findById(row.getProductId());
-            Sale sale = findSaleById(row.getSaleId());
+            Sale sale = saleService.findById(row.getSaleId());
 
             if (product == null || sale == null) continue;
 
@@ -62,15 +62,6 @@ public class WarrantyService {
         }
 
         return warranties;
-    }
-
-    private Sale findSaleById(String saleId) {
-        for (Sale sale : saleService.getAllSales()) {
-            if (sale.getId().equals(saleId)) {
-                return sale;
-            }
-        }
-        return null;
     }
 
     /**

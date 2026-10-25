@@ -45,7 +45,7 @@ public class ReturnService {
             throw new IllegalArgumentException("A return must include at least one product");
         }
 
-        Sale originalSale = findSaleById(saleId);
+        Sale originalSale = saleService.findById(saleId);
         if (originalSale == null) {
             throw new IllegalArgumentException("No sale was found with the id: " + saleId);
         }
@@ -175,15 +175,6 @@ public class ReturnService {
         }
 
         return returns;
-    }
-
-    private Sale findSaleById(String saleId) {
-        for (Sale sale : saleService.getAllSales()) {
-            if (sale.getId().equals(saleId)) {
-                return sale;
-            }
-        }
-        return null;
     }
 
     private Product findProductInSale(List<Product> saleProducts, String productId) {
