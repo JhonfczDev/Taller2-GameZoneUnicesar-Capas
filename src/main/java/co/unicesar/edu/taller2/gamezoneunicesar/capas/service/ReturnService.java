@@ -3,6 +3,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Return;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ReturnRecord;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ReturnRepository;
 
 import java.time.LocalDate;
@@ -21,7 +22,7 @@ public class ReturnService {
      *
      * @param repository     repository used to persist and retrieve returns
      * @param saleService    service used to look up sales
-     * @param productService service used to restore the stock of returned products
+     * @param productService service used to look up products and restore their stock
      */
     public ReturnService(ReturnRepository repository, SaleService saleService, ProductService productService) {
         this.repository = repository;
@@ -65,7 +66,7 @@ public class ReturnService {
             productService.restoreStock(product.getId(), 1);
         }
 
-        List<Return> returns = repository.loadAll();
+        List<Return> returns = loadReturns();
 
         returns.add(newReturn);
         repository.saveAll(returns);
@@ -79,7 +80,7 @@ public class ReturnService {
      * @return the list of all returns
      */
     public List<Return> viewAllReturns() {
-        return repository.loadAll();
+        return loadReturns();
     }
 
     /**
@@ -91,7 +92,7 @@ public class ReturnService {
     public List<Return> viewReturnsByCustomer(String customerId) {
         List<Return> result = new ArrayList<>();
 
-        for (Return returnItem : repository.loadAll()) {
+        for (Return returnItem : loadReturns()) {
             if (returnItem.getSale().getCustomer().getId().equals(customerId)) {
                 result.add(returnItem);
             }
@@ -109,7 +110,7 @@ public class ReturnService {
     public List<Return> viewReturnsBySale(String saleId) {
         List<Return> result = new ArrayList<>();
 
-        for (Return returnItem : repository.loadAll()) {
+        for (Return returnItem : loadReturns()) {
             if (returnItem.getSale().getId().equals(saleId)) {
                 result.add(returnItem);
             }
@@ -136,7 +137,7 @@ public class ReturnService {
         }
 
         double totalReturns = 0.0;
-        for (Return returnItem : repository.loadAll()) {
+        for (Return returnItem : loadReturns()) {
             LocalDate returnDate = returnItem.getReturnDate();
 
             if (returnDate.getMonthValue() == month && returnDate.getYear() == year) {
@@ -145,6 +146,35 @@ public class ReturnService {
         }
 
         return totalSales - totalReturns;
+    }
+
+    /**
+     * Rebuilds the stored returns from the raw records of the repository.
+     * A record whose sale no longer exists is skipped, and a product that no
+     * longer exists is left out of its return.
+     */
+    private List<Return> loadReturns() {
+        List<Return> returns = new ArrayList<>();
+
+        for (ReturnRecord row : repository.loadRecords()) {
+            Sale originalSale = saleService.findById(row.getSaleId());
+            if (originalSale == null) {
+
+                continue;
+            }
+
+            List<Product> returnedProducts = new ArrayList<>();
+            for (String productId : row.getProductIds()) {
+                Product product = productService.findById(productId);
+                if (product != null) {
+                    returnedProducts.add(product);
+                }
+            }
+
+            returns.add(row.toReturn(originalSale, returnedProducts));
+        }
+
+        return returns;
     }
 
     private Sale findSaleById(String saleId) {
@@ -184,6 +214,4 @@ public class ReturnService {
     private String generateReturnId() {
         return "R" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
-
 }
-
