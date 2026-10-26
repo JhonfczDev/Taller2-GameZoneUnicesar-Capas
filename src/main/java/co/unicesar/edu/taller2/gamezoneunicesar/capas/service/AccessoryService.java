@@ -73,20 +73,18 @@ public class AccessoryService {
         return result;
     }
 
+    /**
+     * Retrieves the accessories that are compatible with a console.
+     *
+     * @param consoleId id of the console
+     * @return the accessories whose compatible consoles include the given console
+     */
     public List<Accessory> getCompatibleAccessories(String consoleId) {
         List<Accessory> result = new ArrayList<>();
 
         for (Accessory accessory : repository.loadAll()) {
-            if (accessory instanceof Controller) {
-                Controller controller = (Controller) accessory;
-                if (controller.getCompatibleConsoles().contains(consoleId)) {
-                    result.add(controller);
-                }
-            } else if (accessory instanceof Memory) {
-                Memory memory = (Memory) accessory;
-                if (memory.getCompatibleConsoles().contains(consoleId)) {
-                    result.add(memory);
-                }
+            if (accessory.getCompatibleConsoles().contains(consoleId)) {
+                result.add(accessory);
             }
         }
 
