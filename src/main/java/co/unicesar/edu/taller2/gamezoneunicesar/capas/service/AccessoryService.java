@@ -87,23 +87,17 @@ public class AccessoryService {
         return repository.loadAll();
     }
 
+    /**
+     * Retrieves the accessories of a given type.
+     *
+     * @param accessoryType type name to look for (case insensitive)
+     * @return the accessories whose type matches
+     */
     public List<Accessory> getAccessoriesByType(String accessoryType) {
         List<Accessory> result = new ArrayList<>();
 
         for (Accessory accessory : repository.loadAll()) {
-            String type;
-
-            if (accessory instanceof Controller) {
-                type = "CONTROLLER";
-            } else if (accessory instanceof Cable) {
-                type = "CABLE";
-            } else if (accessory instanceof Memory) {
-                type = "MEMORY";
-            } else {
-                continue;
-            }
-
-            if (type.equalsIgnoreCase(accessoryType)) {
+            if (accessory.getAccessoryType().equalsIgnoreCase(accessoryType)) {
                 result.add(accessory);
             }
         }
