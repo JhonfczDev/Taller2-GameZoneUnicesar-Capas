@@ -15,39 +15,6 @@ public class AccessoryService {
     }
 
     /**
-     * Registers an already built controller.
-     *
-     * @param controller the controller to register
-     * @deprecated use {@link #registerController(String, String, double, int, String)}
-     */
-    @Deprecated
-    public void registerController(Controller controller) {
-        registerAccessory(controller);
-    }
-
-    /**
-     * Registers an already built cable.
-     *
-     * @param cable the cable to register
-     * @deprecated use {@link #registerCable(String, String, double, int, double, String)}
-     */
-    @Deprecated
-    public void registerCable(Cable cable) {
-        registerAccessory(cable);
-    }
-
-    /**
-     * Registers an already built memory.
-     *
-     * @param memory the memory to register
-     * @deprecated use {@link #registerMemory(String, String, double, int, int, String, List)}
-     */
-    @Deprecated
-    public void registerMemory(Memory memory) {
-        registerAccessory(memory);
-    }
-
-    /**
      * Creates and registers a controller from its data. The compatible consoles of a
      * controller are not part of this operation, exactly as they were not stored
      * when the controller was registered with the previous form.
