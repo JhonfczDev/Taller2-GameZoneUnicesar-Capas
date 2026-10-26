@@ -14,15 +14,86 @@ public class AccessoryService {
         this.repository = repository;
     }
 
+    /**
+     * Registers an already built controller.
+     *
+     * @param controller the controller to register
+     * @deprecated use {@link #registerController(String, String, double, int, String)}
+     */
+    @Deprecated
     public void registerController(Controller controller) {
         registerAccessory(controller);
     }
 
+    /**
+     * Registers an already built cable.
+     *
+     * @param cable the cable to register
+     * @deprecated use {@link #registerCable(String, String, double, int, double, String)}
+     */
+    @Deprecated
     public void registerCable(Cable cable) {
         registerAccessory(cable);
     }
 
+    /**
+     * Registers an already built memory.
+     *
+     * @param memory the memory to register
+     * @deprecated use {@link #registerMemory(String, String, double, int, int, String, List)}
+     */
+    @Deprecated
     public void registerMemory(Memory memory) {
+        registerAccessory(memory);
+    }
+
+    /**
+     * Creates and registers a controller from its data. The compatible consoles of a
+     * controller are not part of this operation, exactly as they were not stored
+     * when the controller was registered with the previous form.
+     *
+     * @param id             id of the controller
+     * @param title          title of the controller
+     * @param price          price of the controller
+     * @param stockQuantity  stock quantity
+     * @param connectionType type of connection
+     */
+    public void registerController(String id, String title, double price, int stockQuantity, String connectionType) {
+        registerAccessory(new Controller(id, title, price, stockQuantity, connectionType));
+    }
+
+    /**
+     * Creates and registers a cable from its data.
+     *
+     * @param id            id of the cable
+     * @param title         title of the cable
+     * @param price         price of the cable
+     * @param stockQuantity stock quantity
+     * @param lengthMeters  length in meters
+     * @param connectorType type of connector
+     */
+    public void registerCable(String id, String title, double price, int stockQuantity,
+                              double lengthMeters, String connectorType) {
+        registerAccessory(new Cable(id, title, price, stockQuantity, lengthMeters, connectorType));
+    }
+
+    /**
+     * Creates and registers a memory from its data.
+     *
+     * @param id                 id of the memory
+     * @param title              title of the memory
+     * @param price              price of the memory
+     * @param stockQuantity      stock quantity
+     * @param capacityGB         capacity in GB
+     * @param memoryType         type of memory
+     * @param compatibleConsoles ids of the compatible consoles; {@code null} means none
+     */
+    public void registerMemory(String id, String title, double price, int stockQuantity,
+                               int capacityGB, String memoryType, List<String> compatibleConsoles) {
+        Memory memory = new Memory(id, title, price, stockQuantity, capacityGB, memoryType);
+        if (compatibleConsoles != null) {
+            memory.setCompatibleConsoles(compatibleConsoles);
+        }
         registerAccessory(memory);
     }
 
