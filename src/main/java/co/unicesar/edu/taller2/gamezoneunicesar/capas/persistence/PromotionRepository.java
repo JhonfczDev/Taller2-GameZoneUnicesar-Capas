@@ -70,7 +70,13 @@ public class PromotionRepository {
         }
     }
 
-    public List<Promotion> loadAll() throws FileNotFoundException {
+    /**
+     * Reads the promotions file and rebuilds every stored promotion. If the file
+     * does not exist, an empty list is returned.
+     *
+     * @return the list of stored promotions
+     */
+    public List<Promotion> loadAll() {
 
         List<Promotion> promotions = new ArrayList<>();
 
@@ -131,13 +137,13 @@ public class PromotionRepository {
         } catch (IOException e) {
             throw new RuntimeException("Error loading promotions", e);
         }
-        
+
         return promotions;
     }
 
 
 
-        private void ensureFileExists() {
+    private void ensureFileExists() {
         try {
             File parent = file.getParentFile();
             if (parent != null && !parent.exists()) {
