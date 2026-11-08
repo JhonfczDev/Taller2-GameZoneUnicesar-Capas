@@ -18,7 +18,7 @@ import java.util.*;
  * </p>
  */
 public class PersonService {
-    private PersonStorage repository; // Repository used to read/write data
+    private PersonStorage repository; // Storage used to read/write data
 
     /**
      * Constructor: receives the repository to use (dependency injection).
@@ -73,37 +73,37 @@ public class PersonService {
      *         if the persons file cannot be read
      */
     public List<Customer> getAllCustomers() {
-        List<Person> persons = repository.loadAll();
-        List<Customer> customers = new ArrayList<>();
-
-        for (Person person : persons) {
-            if (person instanceof Customer) {
-                customers.add((Customer) person);
-            }
-        }
-
-        return customers;
+        return getAllOfType(Customer.class);
     }
 
     /**
      * Retrieves all registered sellers by filtering the full list
      * of people, keeping only those that are instances of Seller.
      *
-             * @return list of all sellers
+     * @return list of all sellers
      * @throws co.unicesar.edu.taller2.gamezoneunicesar.capas.excepcions.PersistenceException
      *         if the persons file cannot be read
      */
     public List<Seller> getAllSellers() {
-        List<Person> persons = repository.loadAll();
-        List<Seller> sellers = new ArrayList<>();
+        return getAllOfType(Seller.class);
+    }
 
-        for (Person person : persons) {
-            if (person instanceof Seller) {
-                sellers.add((Seller) person);
+    /**
+     * Retrieves all stored persons of the given type.
+     *
+     * @param type type of person to keep
+     * @return the list of persons of that type
+     */
+    private <T extends Person> List<T> getAllOfType(Class<T> type) {
+        List<T> result = new ArrayList<>();
+
+        for (Person person : repository.loadAll()) {
+            if (type.isInstance(person)) {
+                result.add(type.cast(person));
             }
         }
 
-        return sellers;
+        return result;
     }
 
     /**
