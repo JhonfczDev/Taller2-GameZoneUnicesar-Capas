@@ -6,7 +6,12 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 
-public class WarrantyRepository {
+public class WarrantyRepository implements WarrantyStorage {
+
+    /** Types of warranty that can be stored in the file. */
+    private static final WarrantyTypeRegistry TYPES = new WarrantyTypeRegistry()
+            .register(new BasicWarrantyType())
+            .register(new ExtendedWarrantyType());
 
     private File file;
 
@@ -41,23 +46,20 @@ public class WarrantyRepository {
         }
     }
 
+    @Override
     public void saveAll(List<Warranty> warranties) {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Warranty warranty : warranties) {
 
-                String type = "";
+                WarrantyType type = TYPES.findByWarranty(warranty);
 
-                if (warranty instanceof BasicWarranty) {
-                    type = "BASIC";
-                } else if (warranty instanceof ExtendedWarranty) {
-                    type = "EXTENDED";
-                } else {
+                if (type == null) {
 
                     continue;
                 }
 
-                String line = type + ","
+                String line = type.getTag() + ","
                         + warranty.getId() + ","
                         + warranty.getProduct().getId() + ","
                         + warranty.getSale().getId() + ","
@@ -80,6 +82,7 @@ public class WarrantyRepository {
      *
      * @return the raw records read from the file
      */
+    @Override
     public List<WarrantyRecord> loadRecords() {
 
         List<WarrantyRecord> records = new ArrayList<>();
@@ -97,13 +100,13 @@ public class WarrantyRepository {
 
                 String[] data = line.split(",");
 
-                String type = data[0];
+                String tag = data[0];
                 String id = data[1];
                 String productId = data[2];
                 String saleId = data[3];
                 LocalDate startDate = LocalDate.parse(data[4]);
 
-                records.add(new WarrantyRecord(type, id, productId, saleId, startDate));
+                records.add(new WarrantyRecord(tag, TYPES.findByTag(tag), id, productId, saleId, startDate));
             }
         } catch (IOException e) {
             throw new RuntimeException("Error loading warranties...", e);
