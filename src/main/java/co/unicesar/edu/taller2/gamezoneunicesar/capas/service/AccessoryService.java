@@ -1,28 +1,66 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.AccessoryRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.AccessoryStorage;
 
 import java.util.*;
 import java.io.*;
 
 public class AccessoryService {
 
-    private final AccessoryRepository repository;
+    private final AccessoryStorage repository;
 
-    public AccessoryService(AccessoryRepository repository) {
+    public AccessoryService(AccessoryStorage repository) {
         this.repository = repository;
     }
 
-    public void registerController(Controller controller) {
-        registerAccessory(controller);
+    /**
+     * Creates and registers a controller from its data. The compatible consoles of a
+     * controller are not part of this operation, exactly as they were not stored
+     * when the controller was registered with the previous form.
+     *
+     * @param id             id of the controller
+     * @param title          title of the controller
+     * @param price          price of the controller
+     * @param stockQuantity  stock quantity
+     * @param connectionType type of connection
+     */
+    public void registerController(String id, String title, double price, int stockQuantity, String connectionType) {
+        registerAccessory(new Controller(id, title, price, stockQuantity, connectionType));
     }
 
-    public void registerCable(Cable cable) {
-        registerAccessory(cable);
+    /**
+     * Creates and registers a cable from its data.
+     *
+     * @param id            id of the cable
+     * @param title         title of the cable
+     * @param price         price of the cable
+     * @param stockQuantity stock quantity
+     * @param lengthMeters  length in meters
+     * @param connectorType type of connector
+     */
+    public void registerCable(String id, String title, double price, int stockQuantity,
+                              double lengthMeters, String connectorType) {
+        registerAccessory(new Cable(id, title, price, stockQuantity, lengthMeters, connectorType));
     }
 
-    public void registerMemory(Memory memory) {
+    /**
+     * Creates and registers a memory from its data.
+     *
+     * @param id                 id of the memory
+     * @param title              title of the memory
+     * @param price              price of the memory
+     * @param stockQuantity      stock quantity
+     * @param capacityGB         capacity in GB
+     * @param memoryType         type of memory
+     * @param compatibleConsoles ids of the compatible consoles; {@code null} means none
+     */
+    public void registerMemory(String id, String title, double price, int stockQuantity,
+                               int capacityGB, String memoryType, List<String> compatibleConsoles) {
+        Memory memory = new Memory(id, title, price, stockQuantity, capacityGB, memoryType);
+        if (compatibleConsoles != null) {
+            memory.setCompatibleConsoles(compatibleConsoles);
+        }
         registerAccessory(memory);
     }
 
@@ -49,23 +87,17 @@ public class AccessoryService {
         return repository.loadAll();
     }
 
+    /**
+     * Retrieves the accessories of a given type.
+     *
+     * @param accessoryType type name to look for (case insensitive)
+     * @return the accessories whose type matches
+     */
     public List<Accessory> getAccessoriesByType(String accessoryType) {
         List<Accessory> result = new ArrayList<>();
 
         for (Accessory accessory : repository.loadAll()) {
-            String type;
-
-            if (accessory instanceof Controller) {
-                type = "CONTROLLER";
-            } else if (accessory instanceof Cable) {
-                type = "CABLE";
-            } else if (accessory instanceof Memory) {
-                type = "MEMORY";
-            } else {
-                continue;
-            }
-
-            if (type.equalsIgnoreCase(accessoryType)) {
+            if (accessory.getAccessoryType().equalsIgnoreCase(accessoryType)) {
                 result.add(accessory);
             }
         }
@@ -73,20 +105,18 @@ public class AccessoryService {
         return result;
     }
 
+    /**
+     * Retrieves the accessories that are compatible with a console.
+     *
+     * @param consoleId id of the console
+     * @return the accessories whose compatible consoles include the given console
+     */
     public List<Accessory> getCompatibleAccessories(String consoleId) {
         List<Accessory> result = new ArrayList<>();
 
         for (Accessory accessory : repository.loadAll()) {
-            if (accessory instanceof Controller) {
-                Controller controller = (Controller) accessory;
-                if (controller.getCompatibleConsoles().contains(consoleId)) {
-                    result.add(controller);
-                }
-            } else if (accessory instanceof Memory) {
-                Memory memory = (Memory) accessory;
-                if (memory.getCompatibleConsoles().contains(consoleId)) {
-                    result.add(memory);
-                }
+            if (accessory.getCompatibleConsoles().contains(consoleId)) {
+                result.add(accessory);
             }
         }
 

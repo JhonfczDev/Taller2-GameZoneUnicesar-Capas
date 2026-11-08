@@ -1,27 +1,34 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
 
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 
-public class WarrantyRepository {
+public class WarrantyRepository implements WarrantyStorage {
+
+    /** Types of warranty that can be stored in the file. */
+    private static final WarrantyTypeRegistry TYPES = new WarrantyTypeRegistry()
+            .register(new BasicWarrantyType())
+            .register(new ExtendedWarrantyType());
 
     private File file;
-    private SaleService saleService;
-    private ProductService productService;
-    
-    public WarrantyRepository(ProductService productService) {
-        this("data/warranties.csv", null, productService);
+
+    /**
+     * Creates a repository that uses the default file path ("data/warranties.csv").
+     */
+    public WarrantyRepository() {
+        this("data/warranties.csv");
     }
 
-    public WarrantyRepository(String fileName, SaleService saleService, ProductService productService) {
+    /**
+     * Creates a repository that uses the given file path.
+     *
+     * @param fileName path of the file used to store the warranties
+     */
+    public WarrantyRepository(String fileName) {
         this.file = new File(fileName);
-        this.saleService = saleService;
-        this.productService = productService;
         ensureFileExists();
     }
 
@@ -39,23 +46,20 @@ public class WarrantyRepository {
         }
     }
 
+    @Override
     public void saveAll(List<Warranty> warranties) {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Warranty warranty : warranties) {
 
-                String type = "";
+                WarrantyType type = TYPES.findByWarranty(warranty);
 
-                if (warranty instanceof BasicWarranty) {
-                    type = "BASIC";
-                } else if (warranty instanceof ExtendedWarranty) {
-                    type = "EXTENDED";
-                } else {
+                if (type == null) {
 
                     continue;
                 }
 
-                String line = type + ","
+                String line = type.getTag() + ","
                         + warranty.getId() + ","
                         + warranty.getProduct().getId() + ","
                         + warranty.getSale().getId() + ","
@@ -71,12 +75,20 @@ public class WarrantyRepository {
         }
     }
 
-    public List<Warranty> loadAll() {
+    /**
+     * Reads the warranties file and returns the raw data of every stored warranty.
+     * The product and the sale are kept as ids: resolving them is a job of the
+     * service layer. If the file does not exist, an empty list is returned.
+     *
+     * @return the raw records read from the file
+     */
+    @Override
+    public List<WarrantyRecord> loadRecords() {
 
-        List<Warranty> warranties = new ArrayList<>();
+        List<WarrantyRecord> records = new ArrayList<>();
 
         if (!file.exists()) {
-            return warranties;
+            return records;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -88,46 +100,18 @@ public class WarrantyRepository {
 
                 String[] data = line.split(",");
 
-                String type = data[0];
+                String tag = data[0];
                 String id = data[1];
-                Product product = productService.findById(data[2]);
-                Sale sale = findSaleById(data[3]);
+                String productId = data[2];
+                String saleId = data[3];
                 LocalDate startDate = LocalDate.parse(data[4]);
 
-                if (product == null || sale == null) continue;
-
-                if (type.equals("BASIC")) {
-                    BasicWarranty basic = new BasicWarranty(id, product, sale, startDate);
-
-                    warranties.add(basic);
-
-                } else if (type.equals("EXTENDED")) {
-                    ExtendedWarranty extended = new ExtendedWarranty(id, product, sale, startDate);
-
-
-                    warranties.add(extended);
-                }
+                records.add(new WarrantyRecord(tag, TYPES.findByTag(tag), id, productId, saleId, startDate));
             }
         } catch (IOException e) {
             throw new RuntimeException("Error loading warranties...", e);
         }
 
-        return warranties;
+        return records;
     }
-
-    private Sale findSaleById(String saleId) {
-        for (Sale sale : saleService.getAllSales()) {
-            if (sale.getId().equals(saleId)) {
-                return sale;
-            }
-        }
-        return null;
-    }
-
-    public void setSaleService(SaleService saleService) {
-        this.saleService = saleService;
-    }
-    
-    
-    
 }

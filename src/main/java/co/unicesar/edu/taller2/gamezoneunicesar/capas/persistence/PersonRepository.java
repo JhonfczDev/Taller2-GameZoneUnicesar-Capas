@@ -19,8 +19,18 @@ import java.util.*;
  * rethrown as a {@link PersistenceException} that includes the file path and the
  * operation being performed.
  * </p>
+ * <p>
+ * How each type of person is written to and rebuilt from a line is delegated to
+ * its own {@link LineSerializer}.
+ * </p>
  */
-public class PersonRepository {
+public class PersonRepository implements PersonStorage {
+
+    /** Serializers of the types of person that can be stored in the file. */
+    private static final SerializerRegistry<Person> SERIALIZERS = new SerializerRegistry<Person>()
+            .register(new CustomerSerializer())
+            .register(new SellerSerializer());
+
     private File file; // Physical file where data is read from / written to
 
     /**
@@ -48,41 +58,21 @@ public class PersonRepository {
 
     /**
      * Saves a full list of people (customers and sellers) to the file,
-     * overwriting its previous content. Each type of person is saved
-     * on a line with a different format, identified by the "CUSTOMER"
-     * or "SELLER" tag at the beginning.
+     * overwriting its previous content. Each person is written by the serializer
+     * of its type, which also writes the tag at the beginning of the line.
      *
      * @param persons list of people to save
      * @throws PersistenceException if the file cannot be written
      */
+    @Override
     public void saveAll(List<Person> persons){
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Person person : persons) {
-                // If the person is a Customer, save their data + email
-                if (person instanceof Customer) {
-                    Customer customer = (Customer) person;
-                    String line = "CUSTOMER,"
-                            + customer.getId() + ","
-                            + customer.getName() + ","
-                            + customer.getPhone() + ","
-                            + customer.getEmail();
+                LineSerializer<Person> serializer = SERIALIZERS.findByItem(person);
 
-                    writer.write(line);
-                    writer.newLine();
-
-                    // If the person is a Seller, save their data + employee code and work shift
-                } else if (person instanceof Seller) {
-                    Seller seller = (Seller) person;
-
-                    String line = "SELLER,"
-                            + seller.getId() + ","
-                            + seller.getName() + ","
-                            + seller.getPhone() + ","
-                            + seller.getEmployeeCode() + ","
-                            + seller.getWorkShift();
-
-                    writer.write(line);
+                if (serializer != null) {
+                    writer.write(serializer.toLine(person));
                     writer.newLine();
                 }
             }
@@ -96,13 +86,14 @@ public class PersonRepository {
 
     /**
      * Reads the file line by line and rebuilds the list of Person objects,
-     * distinguishing between Customer and Seller based on the first column
-     * of each line. If the file doesn't exist, returns an empty list instead
+     * using the serializer that matches the tag in the first column of each
+     * line. If the file doesn't exist, returns an empty list instead
      * of failing. Empty lines are skipped.
      *
      * @return list of people loaded from the file
      * @throws PersistenceException if the file cannot be read
      */
+    @Override
     public List<Person> loadAll(){
 
         List<Person> persons = new ArrayList<>();
@@ -123,17 +114,10 @@ public class PersonRepository {
                 // Split the line by commas to get each field
                 String[] data = line.split(",");
 
-                if (data[0].equals("CUSTOMER")) {
-                    // data[1]=id, data[2]=name, data[3]=phone, data[4]=email
-                    Customer customer = new Customer(data[1], data[2], data[3], data[4] );
+                LineSerializer<Person> serializer = SERIALIZERS.findByTag(data[0]);
 
-                    persons.add(customer);
-
-                } else if (data[0].equals("SELLER")) {
-                    // data[1]=id, data[2]=name, data[3]=phone, data[4]=employeeCode, data[5]=workShift
-                    Seller seller = new Seller(data[1], data[2], data[3], data[4], data[5]);
-
-                    persons.add(seller);
+                if (serializer != null) {
+                    persons.add(serializer.fromFields(data));
                 }
             }
         } catch (IOException e) {
@@ -154,13 +138,9 @@ public class PersonRepository {
      * @return the Customer found, or null if it doesn't exist
      * @throws PersistenceException if the file cannot be read
      */
+    @Override
     public Customer findCustomerById(String id) {
-        for (Person person : loadAll()) {
-            if (person instanceof Customer && person.getId().equals(id)) {
-                return (Customer) person;
-            }
-        }
-        return null;
+        return findById(id, Customer.class);
     }
 
     /**
@@ -171,10 +151,22 @@ public class PersonRepository {
      * @return the Seller found, or null if it doesn't exist
      * @throws PersistenceException if the file cannot be read
      */
+    @Override
     public Seller findSellerById(String id) {
+        return findById(id, Seller.class);
+    }
+
+    /**
+     * Finds a person of the given type by id.
+     *
+     * @param id   person's identifier
+     * @param type type of person to look for
+     * @return the person found, or null if it doesn't exist
+     */
+    private <T extends Person> T findById(String id, Class<T> type) {
         for (Person person : loadAll()) {
-            if (person instanceof Seller && person.getId().equals(id)) {
-                return (Seller) person;
+            if (type.isInstance(person) && person.getId().equals(id)) {
+                return type.cast(person);
             }
         }
         return null;

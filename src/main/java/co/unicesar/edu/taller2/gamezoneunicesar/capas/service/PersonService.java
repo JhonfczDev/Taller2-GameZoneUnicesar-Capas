@@ -1,6 +1,6 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PersonRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PersonStorage;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.validations.PersonValidator;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Person;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Customer;
@@ -18,14 +18,14 @@ import java.util.*;
  * </p>
  */
 public class PersonService {
-    private PersonRepository repository; // Repository used to read/write data
+    private PersonStorage repository; // Storage used to read/write data
 
     /**
      * Constructor: receives the repository to use (dependency injection).
      *
      * @param repository the person repository
      */
-    public PersonService(PersonRepository repository) {
+    public PersonService(PersonStorage repository) {
         this.repository = repository;
     }
 
@@ -73,37 +73,37 @@ public class PersonService {
      *         if the persons file cannot be read
      */
     public List<Customer> getAllCustomers() {
-        List<Person> persons = repository.loadAll();
-        List<Customer> customers = new ArrayList<>();
-
-        for (Person person : persons) {
-            if (person instanceof Customer) {
-                customers.add((Customer) person);
-            }
-        }
-
-        return customers;
+        return getAllOfType(Customer.class);
     }
 
     /**
      * Retrieves all registered sellers by filtering the full list
      * of people, keeping only those that are instances of Seller.
      *
-             * @return list of all sellers
-     * @throws co.unicesar.edu.taller2.gamezoneunicesar.capas.exceptions.PersistenceException
+     * @return list of all sellers
+     * @throws co.unicesar.edu.taller2.gamezoneunicesar.capas.excepcions.PersistenceException
      *         if the persons file cannot be read
      */
     public List<Seller> getAllSellers() {
-        List<Person> persons = repository.loadAll();
-        List<Seller> sellers = new ArrayList<>();
+        return getAllOfType(Seller.class);
+    }
 
-        for (Person person : persons) {
-            if (person instanceof Seller) {
-                sellers.add((Seller) person);
+    /**
+     * Retrieves all stored persons of the given type.
+     *
+     * @param type type of person to keep
+     * @return the list of persons of that type
+     */
+    private <T extends Person> List<T> getAllOfType(Class<T> type) {
+        List<T> result = new ArrayList<>();
+
+        for (Person person : repository.loadAll()) {
+            if (type.isInstance(person)) {
+                result.add(type.cast(person));
             }
         }
 
-        return sellers;
+        return result;
     }
 
     /**

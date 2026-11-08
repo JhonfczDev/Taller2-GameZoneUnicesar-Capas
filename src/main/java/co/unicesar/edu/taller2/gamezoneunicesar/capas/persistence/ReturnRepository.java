@@ -2,9 +2,6 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Return;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.ProductService;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -14,8 +11,6 @@ import java.util.List;
 public class ReturnRepository {
 
     private File file;
-    private SaleService saleService;
-    private ProductService productService;
 
     public ReturnRepository() {
         this("data/returns.csv");
@@ -72,13 +67,20 @@ public class ReturnRepository {
         }
     }
 
-    public List<Return> loadAll(){
+    /**
+     * Reads the returns file and returns the raw data of every stored return.
+     * The sale and the products are kept as ids: resolving them is a job of
+     * the service layer. If the file does not exist, an empty list is returned.
+     *
+     * @return the raw records read from the file
+     */
+    public List<ReturnRecord> loadRecords(){
 
-        List<Return> returns = new ArrayList<>();
+        List<ReturnRecord> records = new ArrayList<>();
 
         if (!file.exists()) {
-            
-            return returns;
+
+            return records;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))){
@@ -96,52 +98,20 @@ public class ReturnRepository {
                 String productIdsField = data[3];
                 String reason = data[4];
 
-                Sale originalSale = SaleService.findById(saleId);
-                if (originalSale == null) {
-
-                    continue;
-                }
-
-                List<Product> returnedProducts = new ArrayList<>();
+                List<String> productIds = new ArrayList<>();
                 if (!productIdsField.isEmpty()) {
                     for (String productId : productIdsField.split("\\|")) {
-                        Product product = ProductService.findById(productId);
-                        if (product != null) {
-                            returnedProducts.add(product);
-                        }
+                        productIds.add(productId);
                     }
                 }
 
-                Return returnItem = new Return(id, returnDate, originalSale, returnedProducts, reason);
-                returnItem.calculateRefundAmount();
-
-                returns.add(returnItem);
+                records.add(new ReturnRecord(id, returnDate, saleId, productIds, reason));
             }
         } catch (IOException e) {
 
             throw new RuntimeException("Error loading returns...", e);
         }
 
-        return returns;
+        return records;
     }
-    
-     private Sale findSaleInService(String saleId) {
-        if (saleService == null || saleService.getAllSales() == null) return null;
-        for (Sale sale : saleService.getAllSales()) {
-            if (sale.getId().equals(saleId)) {
-                return sale;
-            }
-        }
-        return null;
-    }
-
-    public void setSaleService(SaleService saleService) {
-        this.saleService = saleService;
-    }
-
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
-    }
-     
-     
 }
