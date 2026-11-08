@@ -2,7 +2,7 @@ package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.WarrantyRecord;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.WarrantyRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.WarrantyStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -10,7 +10,7 @@ import java.io.*;
 
 public class WarrantyService {
 
-    private WarrantyRepository repository;
+    private WarrantyStorage repository;
     private ProductService productService;
     private SaleService saleService;
 
@@ -23,7 +23,7 @@ public class WarrantyService {
      * @param repository     repository used to persist and retrieve warranties
      * @param productService service used to look up products
      */
-    public WarrantyService(WarrantyRepository repository, ProductService productService) {
+    public WarrantyService(WarrantyStorage repository, ProductService productService) {
         this.repository = repository;
         this.productService = productService;
     }
