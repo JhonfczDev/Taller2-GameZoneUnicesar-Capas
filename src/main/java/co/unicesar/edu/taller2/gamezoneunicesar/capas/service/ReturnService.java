@@ -4,7 +4,7 @@ import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.service.SaleService;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ReturnRecord;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ReturnRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.ReturnStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class ReturnService {
 
-    private ReturnRepository repository;
+    private ReturnStorage repository;
     private final SaleService saleService;
     private final ProductService productService;
 
@@ -24,7 +24,7 @@ public class ReturnService {
      * @param saleService    service used to look up sales
      * @param productService service used to look up products and restore their stock
      */
-    public ReturnService(ReturnRepository repository, SaleService saleService, ProductService productService) {
+    public ReturnService(ReturnStorage repository, SaleService saleService, ProductService productService) {
         this.repository = repository;
         this.saleService = saleService;
         this.productService = productService;
