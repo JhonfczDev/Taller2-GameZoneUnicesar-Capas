@@ -1,7 +1,5 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence;
 
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.BasicWarranty;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.ExtendedWarranty;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Product;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Sale;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Warranty;
@@ -19,7 +17,8 @@ import java.time.LocalDate;
  */
 public class WarrantyRecord {
 
-    private final String type;
+    private final String tag;
+    private final WarrantyType warrantyType;
     private final String id;
     private final String productId;
     private final String saleId;
@@ -28,14 +27,17 @@ public class WarrantyRecord {
     /**
      * Creates a record with the data read from one line of the warranties file.
      *
-     * @param type      type tag stored in the file ("BASIC" or "EXTENDED")
-     * @param id        id of the warranty
-     * @param productId id of the covered product
-     * @param saleId    id of the sale the warranty belongs to
-     * @param startDate date the coverage starts
+     * @param tag          type tag stored in the file
+     * @param warrantyType the type that matches the tag, or {@code null} if the tag is unknown
+     * @param id           id of the warranty
+     * @param productId    id of the covered product
+     * @param saleId       id of the sale the warranty belongs to
+     * @param startDate    date the coverage starts
      */
-    public WarrantyRecord(String type, String id, String productId, String saleId, LocalDate startDate) {
-        this.type = type;
+    public WarrantyRecord(String tag, WarrantyType warrantyType, String id, String productId,
+                          String saleId, LocalDate startDate) {
+        this.tag = tag;
+        this.warrantyType = warrantyType;
         this.id = id;
         this.productId = productId;
         this.saleId = saleId;
@@ -48,7 +50,7 @@ public class WarrantyRecord {
      * @return the type tag
      */
     public String getType() {
-        return type;
+        return tag;
     }
 
     /**
@@ -95,13 +97,10 @@ public class WarrantyRecord {
      * @return the rebuilt warranty, or {@code null} if the type tag is unknown
      */
     public Warranty toWarranty(Product product, Sale sale) {
-        if (type.equals("BASIC")) {
-            return new BasicWarranty(id, product, sale, startDate);
-
-        } else if (type.equals("EXTENDED")) {
-            return new ExtendedWarranty(id, product, sale, startDate);
+        if (warrantyType == null) {
+            return null;
         }
 
-        return null;
+        return warrantyType.create(id, product, sale, startDate);
     }
 }
