@@ -1,16 +1,16 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PromotionRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PromotionStorage;
 
 import java.time.LocalDate;
 import java.util.*;
 
 public class PromotionService {
 
-    private PromotionRepository repository;
+    private PromotionStorage repository;
 
-    public PromotionService(PromotionRepository repository) {
+    public PromotionService(PromotionStorage repository) {
         this.repository = repository;
     }
 
