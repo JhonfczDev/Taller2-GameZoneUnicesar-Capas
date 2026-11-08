@@ -1,6 +1,6 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PersonRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.PersonStorage;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.validations.PersonValidator;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Person;
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.Customer;
@@ -18,14 +18,14 @@ import java.util.*;
  * </p>
  */
 public class PersonService {
-    private PersonRepository repository; // Repository used to read/write data
+    private PersonStorage repository; // Repository used to read/write data
 
     /**
      * Constructor: receives the repository to use (dependency injection).
      *
      * @param repository the person repository
      */
-    public PersonService(PersonRepository repository) {
+    public PersonService(PersonStorage repository) {
         this.repository = repository;
     }
 
@@ -90,7 +90,7 @@ public class PersonService {
      * of people, keeping only those that are instances of Seller.
      *
              * @return list of all sellers
-     * @throws co.unicesar.edu.taller2.gamezoneunicesar.capas.exceptions.PersistenceException
+     * @throws co.unicesar.edu.taller2.gamezoneunicesar.capas.excepcions.PersistenceException
      *         if the persons file cannot be read
      */
     public List<Seller> getAllSellers() {
