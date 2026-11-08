@@ -6,10 +6,15 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccessoryRepository {
-    private File file;
+public class AccessoryRepository implements AccessoryStorage {
 
-    private static final String CONSOLE_SEPARATOR = "\\|";
+    /** Serializers of the types of accessory that can be stored in the file. */
+    private static final SerializerRegistry<Accessory> SERIALIZERS = new SerializerRegistry<Accessory>()
+            .register(new ControllerSerializer())
+            .register(new CableSerializer())
+            .register(new MemorySerializer());
+
+    private File file;
 
     public AccessoryRepository() {this("data/accessories.csv");}
 
@@ -19,51 +24,15 @@ public class AccessoryRepository {
         initializeDefaultAccessories();
     }
 
+    @Override
     public void saveAll(List<Accessory> accessories){
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Accessory accessory: accessories) {
+                LineSerializer<Accessory> serializer = SERIALIZERS.findByItem(accessory);
 
-                if (accessory instanceof Controller) {
-                    Controller controller = (Controller) accessory;
-                    String line = "CONTROLLER,"
-                            + controller.getId() + ","
-                            + controller.getTitle() + ","
-                            + controller.getPrice() + ","
-                            + controller.getStockQuantity() + ","
-                            + controller.getConnectionType() + ","
-                            + joinConsoleIds(controller.getCompatibleConsoles());
-
-                    writer.write(line);
-                    writer.newLine();
-
-                } else if (accessory instanceof Cable) {
-                    Cable cable = (Cable) accessory;
-
-                    String line = "CABLE,"
-                            + cable.getId() + ","
-                            + cable.getTitle() + ","
-                            + cable.getPrice() + ","
-                            + cable.getStockQuantity() + ","
-                            + cable.getLengthMeters() + ","
-                            + cable.getConnectorType();
-
-                    writer.write(line);
-                    writer.newLine();
-
-                } else if (accessory instanceof Memory) {
-                    Memory memory = (Memory) accessory;
-
-                    String line = "MEMORY,"
-                            + memory.getId() + ","
-                            + memory.getTitle() + ","
-                            + memory.getPrice() + ","
-                            + memory.getStockQuantity() + ","
-                            + memory.getCapacityGB() + ","
-                            + memory.getMemoryType() + ","
-                            + joinConsoleIds(memory.getCompatibleConsoles());
-
-                    writer.write(line);
+                if (serializer != null) {
+                    writer.write(serializer.toLine(accessory));
                     writer.newLine();
                 }
             }
@@ -73,6 +42,7 @@ public class AccessoryRepository {
         }
     }
 
+    @Override
     public List<Accessory> loadAll(){
 
         List<Accessory> accessories = new ArrayList<>();
@@ -91,47 +61,10 @@ public class AccessoryRepository {
 
                 String[] data = line.split(",");
 
-                if (data[0].equals("CONTROLLER")) {
+                LineSerializer<Accessory> serializer = SERIALIZERS.findByTag(data[0]);
 
-                    Controller controller = new Controller(
-                            data[1],
-                            data[2],
-                            Double.parseDouble(data[3]),
-                            Integer.parseInt(data[4]),
-                            data[5]
-                    );
-
-                    controller.setCompatibleConsoles(splitConsoleIds(data.length > 6 ? data[6] : ""));
-
-                    accessories.add(controller);
-
-                } else if (data[0].equals("CABLE")) {
-
-                    Cable cable = new Cable(
-                            data[1],
-                            data[2],
-                            Double.parseDouble(data[3]),
-                            Integer.parseInt(data[4]),
-                            Double.parseDouble(data[5]),
-                            data[6]
-                    );
-
-                    accessories.add(cable);
-
-                } else if (data[0].equals("MEMORY")) {
-
-                    Memory memory = new Memory(
-                            data[1],
-                            data[2],
-                            Double.parseDouble(data[3]),
-                            Integer.parseInt(data[4]),
-                            Integer.parseInt(data[5]),
-                            data[6]
-                    );
-
-                    memory.setCompatibleConsoles(splitConsoleIds(data.length > 7 ? data[7] : ""));
-
-                    accessories.add(memory);
+                if (serializer != null) {
+                    accessories.add(serializer.fromFields(data));
                 }
             }
         } catch (IOException e) {
@@ -142,6 +75,7 @@ public class AccessoryRepository {
         return accessories;
     }
 
+    @Override
     public Accessory findById(String id) {
         for (Accessory accessory : loadAll()) {
             if (accessory.getId().equals(id)) {
@@ -149,28 +83,6 @@ public class AccessoryRepository {
             }
         }
         return null;
-    }
-
-    private String joinConsoleIds(List<String> consoleIds) {
-        if (consoleIds == null || consoleIds.isEmpty()) {
-
-            return "";
-        }
-
-        return String.join("|", consoleIds);
-    }
-
-    private List<String> splitConsoleIds(String rawField) {
-        List<String> consoleIds = new ArrayList<>();
-        if (rawField == null || rawField.isBlank()) {
-            return consoleIds;
-        }
-        for (String consoleId : rawField.split(CONSOLE_SEPARATOR)) {
-            if (!consoleId.isBlank()) {
-                consoleIds.add(consoleId.trim());
-            }
-        }
-        return consoleIds;
     }
 
     private void ensureFileExists() {
@@ -190,7 +102,7 @@ public class AccessoryRepository {
 
     private void initializeDefaultAccessories() {
         if (file.exists() && file.length() > 0) {
-            
+
             return;
         }
 
