@@ -1,16 +1,16 @@
 package co.unicesar.edu.taller2.gamezoneunicesar.capas.service;
 
 import co.unicesar.edu.taller2.gamezoneunicesar.capas.model.*;
-import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.AccessoryRepository;
+import co.unicesar.edu.taller2.gamezoneunicesar.capas.persistence.AccessoryStorage;
 
 import java.util.*;
 import java.io.*;
 
 public class AccessoryService {
 
-    private final AccessoryRepository repository;
+    private final AccessoryStorage repository;
 
-    public AccessoryService(AccessoryRepository repository) {
+    public AccessoryService(AccessoryStorage repository) {
         this.repository = repository;
     }
 
